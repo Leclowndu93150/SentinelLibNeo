@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.ombremoon.sentinellib.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "sentinellib.refmap.json",
+  "mixins": [
+  ],
+  "client": [
+    "DuckPlayerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
