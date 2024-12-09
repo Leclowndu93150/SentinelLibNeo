@@ -1,5 +1,6 @@
 package com.ombremoon.sentinellib.util;
 
+import com.mojang.math.Axis;
 import com.ombremoon.sentinellib.api.box.BoxInstance;
 import com.ombremoon.sentinellib.api.box.SentinelBox;
 import com.ombremoon.sentinellib.common.ISentinel;
@@ -60,12 +61,12 @@ public class MatrixHelper {
      * @return An identity 4x4 matrix that has been rotated on the y-axis
      */
     private static Matrix4f getEntityRotation(Entity livingEntity, BoxInstance instance, float partialTicks) {
-        float yRot = livingEntity.level().isClientSide ? instance.getYRot() : -instance.getYRot();
-        float yRot0 = livingEntity.level().isClientSide ? instance.getYRot0() : -instance.getYRot0();
+        float yRot = livingEntity.level().isClientSide ? instance.yRot : -instance.yRot;
+        float yRot0 = livingEntity.level().isClientSide ? instance.yRot0 : -instance.yRot0;
 
         Matrix4f matrix4f = new Matrix4f();
         float yawAmount = Mth.clampedLerp(yRot0, yRot, partialTicks);
-        return matrix4f.rotate(yawAmount * Mth.DEG_TO_RAD, new Vector3f(0.0F, 1.0F, 0.0F));
+        return matrix4f.rotate(Axis.YP.rotationDegrees(yawAmount));
     }
 
     public static Matrix4f getMovementMatrix(Entity owner, BoxInstance instance, float partialTicks, SentinelBox.MoverType type) {

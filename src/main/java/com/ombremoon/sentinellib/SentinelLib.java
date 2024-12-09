@@ -13,12 +13,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -31,8 +29,16 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import java.util.List;
 import java.util.function.Supplier;
+
+/*
+CHANGELOG:
+- BoxUtil static fields
+- Fixed Collision Tick
+- Changed typeDamage to BiFunction
+- Added box instance parameter to box specific callbacks
+- Reimplemented Geckolib compat
+ */
 
 @Mod(Constants.MOD_ID)
 @EventBusSubscriber(modid = Constants.MOD_ID)
@@ -50,7 +56,7 @@ public class SentinelLib {
             .defineMovement(SentinelBox.MovementAxis.Z_TRANSLATION, (ticks, partialTicks) -> {
                 return /*Easing.BOUNCE_OUT.easing(3.0F, (float) ticks / 100)*/0F;
             })
-            .typeDamage(DamageTypes.FREEZE, 15).build();
+            .typeDamage(DamageTypes.FREEZE, (entity, living) -> 15F).build();
 
     public static final OBBSentinelBox TEST_CIRCLE = OBBSentinelBox.Builder.of("circle")
             .sizeAndOffset(0.5F, 0, 0.5F, 0)
@@ -66,17 +72,17 @@ public class SentinelLib {
 //                float f0 = Easing.QUART_IN_OUT.easing((float) (13.3F * Math.PI), (float) ticks / 100);
 //                return 2 * (float) Math.cos(0.15F * f0);
 //            })
-            .typeDamage(DamageTypes.FREEZE, 15).build();
+            .typeDamage(DamageTypes.FREEZE, (entity, living) -> 15F).build();
 
     public static final OBBSentinelBox BEAM_BOX = OBBSentinelBox.Builder.of("beam")
             .sizeAndOffset(0.3F, 0.3F, 3, 0.0F, 1.7F, 4)
             .boxDuration(100)
             .activeTicks((entity, integer) -> integer > 45 && integer % 10 == 0)
-            .typeDamage(DamageTypes.FREEZE, 15).build();
+            .typeDamage(DamageTypes.FREEZE, (entity, living) -> 15F).build();
 
 
     public SentinelLib(IEventBus modEventBus, ModContainer modContainer) {
-//        renderGeckolibSentinelBoxes();
+        renderGeckolibSentinelBoxes();
         ITEMS.register(modEventBus);
         if (CommonClass.isDevEnv())
             ITEMS.register("debug", () -> new DebugItem(new Item.Properties()));

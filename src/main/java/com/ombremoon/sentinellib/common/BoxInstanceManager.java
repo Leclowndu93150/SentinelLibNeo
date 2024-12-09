@@ -31,11 +31,11 @@ public class BoxInstanceManager {
             if (boxInstance.equals(instance)) return false;
         }
         this.instances.add(instance);
-        var rotation = sentinelBox.getProperRotation(entity);
-        float f0 = rotation.getFirst();
-        float f1 = rotation.getSecond();
-        instance.setYRotation(f0, f1);
-        sentinelBox.onBoxTrigger().accept(entity);
+        var yRot = sentinelBox.getYRot(entity);
+        float f0 = yRot.getFirst();
+        float f1 = yRot.getSecond();
+        instance.setRotation(f0, f1);
+        sentinelBox.onBoxTrigger().accept(entity, instance);
         return true;
     }
 

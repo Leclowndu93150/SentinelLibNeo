@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -26,14 +27,15 @@ public abstract class SentinelBox {
     private final int duration;
     private final Predicate<Entity> stopPredicate;
     private final BiPredicate<Entity, Integer> activeDuration;
-    private final Predicate<Entity> attackCondition;
-    private final Consumer<Entity> boxStart;
-    private final Consumer<Entity> boxTick;
-    private final Consumer<Entity> boxStop;
-    private final Consumer<Entity> boxActive;
+    private final BiPredicate<Entity, LivingEntity> attackCondition;
+    private final BiConsumer<Entity, BoxInstance> boxStart;
+    private final BiConsumer<Entity, BoxInstance> boxTick;
+    private final BiConsumer<Entity, BoxInstance> boxStop;
+    private final BiConsumer<Entity, BoxInstance> boxActive;
+    private final BiConsumer<Entity, LivingEntity> boxCollision;
     private final BiConsumer<Entity, LivingEntity> boxHurt;
     private final ResourceKey<DamageType> damageType;
-    private final float damageAmount;
+    protected final BiFunction<Entity, LivingEntity, Float> damageFunction;
     private final MoverType moverType;
     private final Int2ObjectOpenHashMap<BiFunction<Integer, Float, Float>> boxMovement;
     private final Int2ObjectOpenHashMap<Function<Integer, Float>> boxScale;
@@ -55,9 +57,10 @@ public abstract class SentinelBox {
         this.boxTick = builder.boxTick;
         this.boxStop = builder.boxStop;
         this.boxHurt = builder.boxHurt;
+        this.boxCollision = builder.boxCollision;
         this.boxActive = builder.boxActive;
         this.damageType = builder.damageType;
-        this.damageAmount = builder.damageAmount;
+        this.damageFunction = builder.damageFunction;
         this.moverType = builder.moverType;
         this.boxMovement = builder.boxMovement;
         this.boxScale = builder.boxScale;
@@ -110,24 +113,28 @@ public abstract class SentinelBox {
         return this.activeDuration;
     }
 
-    public Predicate<Entity> getAttackCondition() {
+    public BiPredicate<Entity, LivingEntity> getAttackCondition() {
         return this.attackCondition;
     }
 
-    public Consumer<Entity> onBoxTrigger() {
+    public BiConsumer<Entity, BoxInstance> onBoxTrigger() {
         return this.boxStart;
     }
 
-    public Consumer<Entity> onBoxTick() {
+    public BiConsumer<Entity, BoxInstance> onBoxTick() {
         return this.boxTick;
     }
 
-    public Consumer<Entity> onBoxStop() {
+    public BiConsumer<Entity, BoxInstance> onBoxStop() {
         return this.boxStop;
     }
 
-    public Consumer<Entity> onActiveTick() {
+    public BiConsumer<Entity, BoxInstance> onActiveTick() {
         return this.boxActive;
+    }
+
+    public BiConsumer<Entity, LivingEntity> onCollisionTick() {
+        return this.boxCollision;
     }
 
     public BiConsumer<Entity, LivingEntity> onHurtTick() {
@@ -138,8 +145,8 @@ public abstract class SentinelBox {
         return this.damageType;
     }
 
-    public float getDamageAmount() {
-        return this.damageAmount;
+    public float getDamageAmount(Entity owner, LivingEntity target) {
+        return this.damageFunction.apply(owner, target);
     }
 
     public MoverType getMoverType() {
@@ -166,7 +173,7 @@ public abstract class SentinelBox {
         return new Vec3(1, 1, 1);
     }
 
-    public Pair<Float, Float> getProperRotation(Entity entity) {
+    public Pair<Float, Float> getYRot(Entity entity) {
         float f0;
         float f1;
         if (entity instanceof LivingEntity livingEntity) {
@@ -232,14 +239,15 @@ public abstract class SentinelBox {
         protected int duration = 30;
         protected Predicate<Entity> stopPredicate = livingEntity -> false;
         protected BiPredicate<Entity, Integer> activeDuration = (entity, integer) -> integer % 10 == 0;
-        protected Predicate<Entity> attackCondition = livingEntity -> true;
-        protected Consumer<Entity> boxStart = attacker -> {};
-        protected Consumer<Entity> boxTick = attacker -> {};
-        protected Consumer<Entity> boxStop = attacker -> {};
-        protected Consumer<Entity> boxActive = attacker -> {};
+        protected BiPredicate<Entity, LivingEntity> attackCondition = (entity, livingEntity) -> true;
+        protected BiConsumer<Entity, BoxInstance> boxStart = (attacker, instance) -> {};
+        protected BiConsumer<Entity, BoxInstance> boxTick = (attacker, instance) -> {};
+        protected BiConsumer<Entity, BoxInstance> boxStop = (attacker, instance) -> {};
+        protected BiConsumer<Entity, BoxInstance> boxActive = (attacker, instance) -> {};
         protected BiConsumer<Entity, LivingEntity> boxHurt = (attacker, target) -> {};
+        protected BiConsumer<Entity, LivingEntity> boxCollision = (attacker, target) -> {};
         protected ResourceKey<DamageType> damageType;
-        protected float damageAmount;
+        protected BiFunction<Entity, LivingEntity, Float> damageFunction = (entity, living) -> 0F;
         protected MoverType moverType = MoverType.HEAD;
         protected Int2ObjectOpenHashMap<BiFunction<Integer, Float, Float>> boxMovement = new Int2ObjectOpenHashMap<>();
         protected Int2ObjectOpenHashMap<Function<Integer, Float>> boxScale = new Int2ObjectOpenHashMap<>();

@@ -10,8 +10,8 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 @EventBusSubscriber(modid = Constants.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class PayloadHandler {
 
-    public static void syncRotation(int entityID, String boxId, float rot, float rot0) {
-        PacketDistributor.sendToServer(new ServerboundSyncRotation(entityID, boxId, rot, rot0));
+    public static void syncRotation(int entityID, String boxId, float yRot, float yRot0) {
+        PacketDistributor.sendToServer(new ServerboundSyncRotation(entityID, boxId, yRot, yRot0));
     }
 
     public static void triggerSentinelBox(int entityID, String boxID) {

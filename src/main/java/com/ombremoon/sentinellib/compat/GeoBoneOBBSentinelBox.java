@@ -2,6 +2,7 @@ package com.ombremoon.sentinellib.compat;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.ombremoon.sentinellib.api.box.AABBSentinelBox;
 import com.ombremoon.sentinellib.api.box.BoxInstance;
 import com.ombremoon.sentinellib.api.box.OBBSentinelBox;
 import com.ombremoon.sentinellib.util.MatrixHelper;
@@ -132,7 +133,7 @@ public final class GeoBoneOBBSentinelBox extends OBBSentinelBox {
          * @param attackCondition
          * @return The builder
          */
-        public Builder attackCondition(Predicate<Entity> attackCondition) {
+        public Builder attackCondition(BiPredicate<Entity, LivingEntity> attackCondition) {
             this.attackCondition = attackCondition;
             return this;
         }
@@ -142,7 +143,7 @@ public final class GeoBoneOBBSentinelBox extends OBBSentinelBox {
          * @param startConsumer
          * @return
          */
-        public Builder onBoxTrigger(Consumer<Entity> startConsumer) {
+        public Builder onBoxTrigger(BiConsumer<Entity, BoxInstance> startConsumer) {
             this.boxStart = startConsumer;
             return this;
         }
@@ -152,7 +153,7 @@ public final class GeoBoneOBBSentinelBox extends OBBSentinelBox {
          * @param tickConsumer
          * @return
          */
-        public Builder onBoxTick(Consumer<Entity> tickConsumer) {
+        public Builder onBoxTick(BiConsumer<Entity, BoxInstance> tickConsumer) {
             this.boxTick = tickConsumer;
             return this;
         }
@@ -162,7 +163,7 @@ public final class GeoBoneOBBSentinelBox extends OBBSentinelBox {
          * @param stopConsumer
          * @return
          */
-        public Builder onBoxStop(Consumer<Entity> stopConsumer) {
+        public Builder onBoxStop(BiConsumer<Entity, BoxInstance> stopConsumer) {
             this.boxStop = stopConsumer;
             return this;
         }
@@ -172,8 +173,13 @@ public final class GeoBoneOBBSentinelBox extends OBBSentinelBox {
          * @param activeConsumer
          * @return
          */
-        public Builder onActiveTick(Consumer<Entity> activeConsumer) {
+        public Builder onActiveTick(BiConsumer<Entity, BoxInstance> activeConsumer) {
             this.boxActive = activeConsumer;
+            return this;
+        }
+
+        public Builder onCollisionTick(BiConsumer<Entity, LivingEntity> attackConsumer) {
+            this.boxCollision = attackConsumer;
             return this;
         }
 
@@ -190,12 +196,11 @@ public final class GeoBoneOBBSentinelBox extends OBBSentinelBox {
         /**
          * Defines the damage type and amount the box causes while active
          * @param damageType
-         * @param damageAmount
          * @return The builder
          */
-        public Builder typeDamage(ResourceKey<DamageType> damageType, float damageAmount) {
+        public Builder typeDamage(ResourceKey<DamageType> damageType, BiFunction<Entity, LivingEntity, Float> damageFunction) {
             this.damageType = damageType;
-            this.damageAmount = damageAmount;
+            this.damageFunction = damageFunction;
             return this;
         }
 

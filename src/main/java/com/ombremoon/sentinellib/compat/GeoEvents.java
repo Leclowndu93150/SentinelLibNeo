@@ -1,5 +1,14 @@
 package com.ombremoon.sentinellib.compat;
 
+import com.ombremoon.sentinellib.api.box.BoxInstance;
+import com.ombremoon.sentinellib.common.BoxInstanceManager;
+import com.ombremoon.sentinellib.common.ISentinel;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.world.entity.Entity;
+import net.neoforged.bus.api.SubscribeEvent;
+import software.bernie.geckolib.event.GeoRenderEvent;
+
 public class GeoEvents {
 
     private static GeoEvents instance;
@@ -11,7 +20,7 @@ public class GeoEvents {
         return instance;
     }
 
-/*    @SubscribeEvent
+    @SubscribeEvent
     public void renderGeckolibSentinelBoxes(GeoRenderEvent.Entity.Post event) {
         Entity entity = event.getEntity();
         Minecraft minecraft = Minecraft.getInstance();
@@ -27,14 +36,8 @@ public class GeoEvents {
                 }
             }
 
-            if (event.getRenderer() instanceof ISentinelRenderer<?> renderer)
-                renderer.trackSentinelModel(event.getModel());
-
-            var s = sentinel.getBoxManager().getInstances();
-            for (var m : s) {
-                Constants.LOG.info(String.valueOf(m.getKey().getWorldPosition().x));
-                Constants.LOG.info(String.valueOf(m.getCenter()));
-            }
+//            if (event.getRenderer() instanceof ISentinelRenderer<?> renderer)
+//                renderer.trackSentinelModel(event.getModel());
         }
-    }*/
+    }
 }

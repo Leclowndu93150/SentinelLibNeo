@@ -94,22 +94,22 @@ neoForge {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
-//    maven {
-//        name = 'GeckoLib'
-//        url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
-//        content {
-//            includeGroupByRegex("software\\.bernie.*")
-//            includeGroup("com.eliotlash.mclib")
-//
-//        }
-//    }
+    maven {
+        name = 'GeckoLib'
+        url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+        content {
+            includeGroupByRegex("software\\.bernie.*")
+            includeGroup("com.eliotlash.mclib")
+
+        }
+    }
 }
 
 dependencies {
-//    compileOnly "software.bernie.geckolib:geckolib-forge-${minecraft_version}:${geckolib_version}"
-//    runtimeOnly "software.bernie.geckolib:geckolib-forge-${minecraft_version}:${geckolib_version}"
-//    compileOnly "com.eliotlash.mclib:mclib:20"
-//    runtimeOnly "com.eliotlash.mclib:mclib:20"
+    compileOnly "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
+    runtimeOnly "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
+    compileOnly "com.eliotlash.mclib:mclib:20"
+    runtimeOnly "com.eliotlash.mclib:mclib:20"
 }
 
 

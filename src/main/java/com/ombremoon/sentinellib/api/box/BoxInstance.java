@@ -16,7 +16,6 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -88,6 +87,10 @@ public class BoxInstance {
         return this.centerVec;
     }
 
+    public Vec3 getWorldCenter() {
+        return getCenter().multiply(-1, 1, -1);
+    }
+
     /**
      * Handles the operations of the box instance every tick
      */
@@ -103,10 +106,10 @@ public class BoxInstance {
             this.deactivateBox();
 
         if (this.boxOwner.level().isClientSide) {
-            var rotation = sentinelBox.getProperRotation(this.boxOwner);
-            float f0 = rotation.getFirst();
-            float f1 = rotation.getSecond();
-            this.setYRotation(f0, f1);
+            var yRot = sentinelBox.getYRot(this.boxOwner);
+            float f0 = yRot.getFirst();
+            float f1 = yRot.getSecond();
+            this.setRotation(f0, f1);
             PayloadHandler.syncRotation(this.boxOwner.getId(), this.sentinelBox.getName(), f0, f1);
         }
 
@@ -119,14 +122,14 @@ public class BoxInstance {
             if (this.sentinelBox.getActiveDuration().test(this.boxOwner, this.tickCount)) {
                 this.isActive = true;
                 this.checkEntityInside(this.boxOwner);
-                this.sentinelBox.onActiveTick().accept(this.boxOwner);
+                this.sentinelBox.onActiveTick().accept(this.boxOwner, this);
             } else {
                 this.isActive = false;
             }
         } else {
             this.deactivateBox();
         }
-        this.sentinelBox.onBoxTick().accept(this.boxOwner);
+        this.sentinelBox.onBoxTick().accept(this.boxOwner, this);
         this.dynamicYRot0 = this.dynamicYRot;
     }
 
@@ -135,31 +138,30 @@ public class BoxInstance {
      * @param owner The owner of the box instance (will be ignored in the check)
      */
     public void checkEntityInside(Entity owner) {
-        if (!owner.level().isClientSide) {
-            List<Entity> entityList = sentinelBox.getEntityCollisions(owner, this);
-            for (Entity entity : entityList) {
-                LivingEntity livingEntity = (LivingEntity) entity;
-                if (sentinelBox.getAttackCondition().test(livingEntity)) {
-                    if (!this.hurtEntities.contains(livingEntity)) {
-                        ResourceKey<DamageType> damageType = sentinelBox.getDamageType();
-                        if (damageType != null) {
-                            livingEntity.hurt(BoxUtil.sentinelDamageSource(livingEntity.level(), damageType, owner), sentinelBox.getDamageAmount());
-                            sentinelBox.onHurtTick().accept(this.boxOwner, livingEntity);
-                        }
-
-                        this.hurtEntities.add(livingEntity);
+        List<Entity> entityList = sentinelBox.getEntityCollisions(owner, this);
+        for (Entity entity : entityList) {
+            LivingEntity livingEntity = (LivingEntity) entity;
+            if (sentinelBox.getAttackCondition().test(this.boxOwner, livingEntity)) {
+                if (!this.hurtEntities.contains(livingEntity)) {
+                    ResourceKey<DamageType> damageType = sentinelBox.getDamageType();
+                    if (damageType != null) {
+                        livingEntity.hurt(BoxUtil.damageSource(livingEntity.level(), damageType, owner), sentinelBox.getDamageAmount(this.boxOwner, livingEntity));
+                        sentinelBox.onHurtTick().accept(this.boxOwner, livingEntity);
                     }
+
+                    this.hurtEntities.add(livingEntity);
                 }
             }
-            this.hurtEntities.clear();
+            sentinelBox.onCollisionTick().accept(this.boxOwner, livingEntity);
         }
+        this.hurtEntities.clear();
     }
 
     /**
      * Deactivates the box instance and removes it from the Sentinel's {@link BoxInstanceManager}.
      */
     public void deactivateBox() {
-        this.sentinelBox.onBoxStop().accept(this.boxOwner);
+        this.sentinelBox.onBoxStop().accept(this.boxOwner, this);
         ((ISentinel)this.boxOwner).getBoxManager().removeInstance(this);
     }
 
@@ -183,19 +185,11 @@ public class BoxInstance {
         this.centerVec = MatrixHelper.transform(matrix4f, this.sentinelBox.getBoxOffset().multiply(-1.0F, 1.0F, -1.0F));
     }
 
-    public void setYRotation(float yRot, float yRot0) {
+    public void setRotation(float yRot, float yRot0) {
         this.yRot = yRot;
         this.yRot0 = yRot0;
     }
-
-    public float getYRot() {
-        return this.yRot;
-    }
-
-    public float getYRot0() {
-        return this.yRot0;
-    }
-
+    
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

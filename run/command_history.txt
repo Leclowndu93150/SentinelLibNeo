@@ -1,1 +1,3 @@
 /give dev sentinellib:debug
+/summon minecraft:husk
+/

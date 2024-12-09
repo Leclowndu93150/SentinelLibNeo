@@ -36,7 +36,7 @@ public record ServerboundSyncRotation(int entityId, String boxName, float yRot, 
             if (entity instanceof ISentinel sentinel) {
                 var instance = sentinel.getBoxManager().getBoxInstance(payload.boxName());
                 if (instance != null)
-                    instance.setYRotation(payload.yRot(), payload.yRot0());
+                    instance.setRotation(payload.yRot(), payload.yRot0());
             }
         });
     }
