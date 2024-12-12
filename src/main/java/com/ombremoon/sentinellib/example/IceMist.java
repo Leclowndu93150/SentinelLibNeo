@@ -1,4 +1,3 @@
-/*
 package com.ombremoon.sentinellib.example;
 
 import com.ombremoon.sentinellib.SentinelLib;
@@ -39,9 +38,8 @@ public class IceMist extends Entity implements TraceableEntity, GeoEntity, ISent
     public static final GeoBoneOBBSentinelBox CENTER = GeoBoneOBBSentinelBox.Builder.of("mist_center")
             .sizeAndOffset(0.3125F)
             .activeTicks((entity, ticks) -> ticks % 20 == 0)
-            .typeDamage(DamageTypes.FREEZE, 2.0F)
-            */
-/*.scaleOut(ticks -> {
+            .typeDamage(DamageTypes.FREEZE, (entity, livingEntity) -> 2.0F)
+            .scaleOut(ticks -> {
                 if (ticks < 20) {
                     return 0.0F;
                 } else if (ticks < 60) {
@@ -51,16 +49,14 @@ public class IceMist extends Entity implements TraceableEntity, GeoEntity, ISent
                 } else {
                     return 1.0F;
                 }
-            })*//*
-
+            })
             .noDuration(Entity::isRemoved).build();
 
     public static final GeoBoneOBBSentinelBox ROT = GeoBoneOBBSentinelBox.Builder.of("mist1")
             .sizeAndOffset(0.375F)
             .activeTicks((entity, ticks) -> ticks % 20 == 0)
-            .typeDamage(DamageTypes.FREEZE, 2.0F)
-            */
-/*.scaleOut(ticks -> {
+            .typeDamage(DamageTypes.FREEZE, (entity, livingEntity) -> 2.0F)
+            .scaleOut(ticks -> {
                 if (ticks < 20) {
                     return 0.0F;
                 } else if (ticks < 60) {
@@ -70,8 +66,7 @@ public class IceMist extends Entity implements TraceableEntity, GeoEntity, ISent
                 } else {
                     return 1.0F;
                 }
-            })*//*
-
+            })
             .noDuration(Entity::isRemoved).build();
 
     public IceMist(EntityType<?> pEntityType, Level pLevel) {
@@ -138,33 +133,32 @@ public class IceMist extends Entity implements TraceableEntity, GeoEntity, ISent
         tickBoxes();
 //        this.discard();
         super.tick();
-        */
-/*List<Entity> entityList = this.level().getEntities(this.getOwner(), this.getBoundingBox());
+        List<Entity> entityList = this.level().getEntities(this.getOwner(), this.getBoundingBox());
         for (Entity entity : entityList) {
             if (entity instanceof LivingEntity livingEntity && this.tickCount % 20 == 0) {
                 livingEntity.hurt(this.level().damageSources().freeze(), 2);
                 //TODO: CHECK
                 livingEntity.setIsInPowderSnow(true);
             }
-        }*//*
+        }
 
         if (this.tickCount >= 400) {
             this.discard();
         }
 
-        if (this.tickCount == 1 && this.level().isClientSide) {
-            triggerAllSentinelBoxes();
+//        if (this.tickCount == 1 && this.level().isClientSide) {
+//            triggerAllSentinelBoxes();
 //            triggerSentinelBox(ROT);
-        }
+//        }
     }
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "Mist", 0, state -> state.setAndContinue(MIST)));
+//        controllers.add(new AnimationController<>(this, "Mist", 0, state -> state.setAndContinue(MIST)));
     }
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return this.cache;
     }
-}*/
+}

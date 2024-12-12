@@ -34,7 +34,9 @@ public class BoxInstanceManager {
         var yRot = sentinelBox.getYRot(entity);
         float f0 = yRot.getFirst();
         float f1 = yRot.getSecond();
-        instance.setRotation(f0, f1);
+        float f2 = entity.getXRot();
+        float f3 = entity.xRotO;
+        instance.setRotation(f2, f3, f0, f1);
         sentinelBox.onBoxTrigger().accept(entity, instance);
         return true;
     }

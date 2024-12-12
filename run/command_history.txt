@@ -1,3 +1,13 @@
 /give dev sentinellib:debug
 /summon minecraft:husk
 /
+/time set day
+/summon sentinellib:ice_mist
+/locate structure minecraft:bastion_remnant
+/tp @s -160 ~ -272
+/locate structure minecraft:fortress
+/tp @s -736 ~ -768
+/tp @s -160 ~ -272
+/kill
+/give Dev sentinellib:debug
+/summon minecraft:warden

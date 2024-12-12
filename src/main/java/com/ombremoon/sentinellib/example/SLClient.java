@@ -1,4 +1,3 @@
-/*
 package com.ombremoon.sentinellib.example;
 
 import com.ombremoon.sentinellib.CommonClass;
@@ -17,4 +16,3 @@ final class SLClient {
             event.registerEntityRenderer(SentinelLib.MIST.get(), IceMistRenderer::new);
     }
 }
-*/

@@ -1,4 +1,3 @@
-/*
 package com.ombremoon.sentinellib.example;
 
 import com.ombremoon.sentinellib.CommonClass;
@@ -16,4 +15,3 @@ public class IceMistModel extends DefaultedEntityGeoModel<IceMist> {
         return RenderType.entityTranslucentEmissive(getTextureResource(animatable));
     }
 }
-*/

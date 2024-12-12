@@ -27,14 +27,17 @@ public class OBBSentinelBox extends SentinelBox {
     @Override
     public AABB getSentinelBB(BoxInstance instance) {
         Vec3 center = instance.getCenter();
-        return this.aabb.inflate(this.aabb.maxX - this.aabb.minX, this.aabb.maxY - this.aabb.minY, this.aabb.maxZ - this.aabb.minZ).move(-center.x, center.y, -center.z);
+        return this.aabb.inflate(this.aabb.maxX - this.aabb.minX, this.aabb.maxY - this.aabb.minY, this.aabb.maxZ - this.aabb.minZ).move(center.x, center.y, center.z);
     }
 
     @Override
     public void renderBox(BoxInstance instance, Entity entity, PoseStack poseStack, VertexConsumer vertexConsumer, float partialTicks, float isRed) {
         Matrix4f transpose = MatrixHelper.getMovementMatrix(entity, instance, partialTicks, this.getMoverType());
+        Vec3 offset = this.getBoxOffset();
         poseStack.pushPose();
-        poseStack.mulPose(MatrixHelper.quaternion(transpose));
+        poseStack.translate(0.0F, (float) instance.getSentinelBox().getBoxOffset().y, 0.0F);
+        poseStack.mulPose(MatrixHelper.quaternion(transpose).conjugate());
+        poseStack.translate(0.0F, (float) -instance.getSentinelBox().getBoxOffset().y, 0.0F);
         Matrix4f matrix = poseStack.last().pose();
         if (this.getMoverType().isDefined()) {
             Vec3 vec3 = this.getBoxPath(instance, partialTicks);
@@ -44,7 +47,6 @@ public class OBBSentinelBox extends SentinelBox {
         PoseStack.Pose pose = poseStack.last();
         Vec3 scale = this.getScaleFactor(instance);
         Vec3 vertex = this.getVertexPos().multiply(scale.x, scale.y, scale.z);
-        Vec3 offset = this.getBoxOffset();
         float maxX = (float)(offset.x + vertex.x);
         float maxY = (float)(offset.y + vertex.y);
         float maxZ = (float)(offset.z + vertex.z);

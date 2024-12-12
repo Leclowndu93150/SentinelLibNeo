@@ -9,14 +9,17 @@ import com.ombremoon.sentinellib.common.IPlayerSentinel;
 import com.ombremoon.sentinellib.common.ISentinel;
 import com.ombremoon.sentinellib.common.event.RegisterPlayerSentinelBoxEvent;
 import com.ombremoon.sentinellib.compat.GeoEvents;
+import com.ombremoon.sentinellib.example.IceMist;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -44,6 +47,9 @@ CHANGELOG:
 @EventBusSubscriber(modid = Constants.MOD_ID)
 public class SentinelLib {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(Constants.MOD_ID);
+    public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(Registries.ENTITY_TYPE, Constants.MOD_ID);
+
+    public static Supplier<EntityType<IceMist>> MIST;
 
     public static final OBBSentinelBox TEST_ELASTIC = OBBSentinelBox.Builder.of("test")
             .sizeAndOffset(2F, 0.0F, 1, 1.0F)
@@ -76,7 +82,7 @@ public class SentinelLib {
 
     public static final OBBSentinelBox BEAM_BOX = OBBSentinelBox.Builder.of("beam")
             .sizeAndOffset(0.3F, 0.3F, 3, 0.0F, 1.7F, 4)
-            .boxDuration(100)
+            .noDuration(Entity::isCrouching)
             .activeTicks((entity, integer) -> integer > 45 && integer % 10 == 0)
             .typeDamage(DamageTypes.FREEZE, (entity, living) -> 15F).build();
 
@@ -84,8 +90,11 @@ public class SentinelLib {
     public SentinelLib(IEventBus modEventBus, ModContainer modContainer) {
         renderGeckolibSentinelBoxes();
         ITEMS.register(modEventBus);
-        if (CommonClass.isDevEnv())
+        ENTITY_TYPES.register(modEventBus);
+        if (CommonClass.isDevEnv()) {
             ITEMS.register("debug", () -> new DebugItem(new Item.Properties()));
+            MIST = ENTITY_TYPES.register("ice_mist", () -> EntityType.Builder.<IceMist>of(IceMist::new, MobCategory.MISC).sized(1, 1).clientTrackingRange(64).build("ice_mist"));
+        }
     }
 
     @SubscribeEvent

@@ -5,8 +5,12 @@ import com.ombremoon.sentinellib.api.BoxUtil;
 import com.ombremoon.sentinellib.common.BoxInstanceManager;
 import com.ombremoon.sentinellib.common.ISentinel;
 import com.ombremoon.sentinellib.networking.PayloadHandler;
+import com.ombremoon.sentinellib.networking.ServerboundSyncRotation;
 import com.ombremoon.sentinellib.util.MatrixHelper;
+import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
@@ -26,10 +30,12 @@ public class BoxInstance {
     private final Entity boxOwner;
     private boolean isActive;
     public int tickCount = 0;
+    public float xRot;
+    public float xRot0;
     public float yRot;
     public float yRot0;
-    public float dynamicYRot;
-    public float dynamicYRot0;
+    public float zRot;
+    public float zRot0;
     private Vec3 centerVec;
     protected Vec3[] instanceVertices;
     protected Vec3[] instanceNormals;
@@ -49,7 +55,7 @@ public class BoxInstance {
         double xSize = (aabb.maxX - aabb.minX) / 2;
         double ySize = (aabb.maxY - aabb.minY) / 2;
         double zSize = (aabb.maxZ - aabb.minZ) / 2;
-        this.centerVec = new Vec3(-((float)aabb.minX + xSize), (float)aabb.minY + ySize, -((float)aabb.minZ + zSize));
+        this.centerVec = new Vec3(((float)aabb.minX + xSize), (float)aabb.minY + ySize, ((float)aabb.minZ + zSize));
         this.instanceVertices = new Vec3[]{new Vec3(-xSize, ySize, -zSize), new Vec3(-xSize, ySize, zSize), new Vec3(xSize, ySize, zSize), new Vec3(xSize, ySize, -zSize)};
         this.instanceNormals = new Vec3[]{new Vec3(1.0F, 0.0F, 0.0F), new Vec3(0.0F, 1.0F, 0.0F), new Vec3(0.0F, 0.0F, 1.0F)};
     }
@@ -87,16 +93,11 @@ public class BoxInstance {
         return this.centerVec;
     }
 
-    public Vec3 getWorldCenter() {
-        return getCenter().multiply(-1, 1, -1);
-    }
-
     /**
      * Handles the operations of the box instance every tick
      */
     public void tick() {
         this.tickCount++;
-        this.dynamicYRot++;
         if (this.boxOwner == null) {
             Constants.LOG.warn("Sentinel box does not have an owner and will not function as intended");
             return;
@@ -106,11 +107,11 @@ public class BoxInstance {
             this.deactivateBox();
 
         if (this.boxOwner.level().isClientSide) {
+            this.zRot += 2;
             var yRot = sentinelBox.getYRot(this.boxOwner);
-            float f0 = yRot.getFirst();
-            float f1 = yRot.getSecond();
-            this.setRotation(f0, f1);
-            PayloadHandler.syncRotation(this.boxOwner.getId(), this.sentinelBox.getName(), f0, f1);
+            var rot = new BoxRotation(this.boxOwner.getXRot(), this.boxOwner.xRotO, yRot.getFirst(), yRot.getSecond(), 0, 0);
+            this.setRotation(rot.xRot, rot.xRot0, rot.yRot, rot.yRot0);
+            PayloadHandler.syncRotation(this.boxOwner.getId(), this.sentinelBox.getName(), rot);
         }
 
         int duration = this.sentinelBox.getDuration();
@@ -118,6 +119,8 @@ public class BoxInstance {
             Matrix4f matrix4f = MatrixHelper.getMovementMatrix(this.boxOwner, this, 1.0F, this.sentinelBox.getMoverType());
 
             this.updatePositionAndRotation(matrix4f);
+
+            Constants.LOG.debug("{}", this.getCenter());
 
             if (this.sentinelBox.getActiveDuration().test(this.boxOwner, this.tickCount)) {
                 this.isActive = true;
@@ -130,7 +133,7 @@ public class BoxInstance {
             this.deactivateBox();
         }
         this.sentinelBox.onBoxTick().accept(this.boxOwner, this);
-        this.dynamicYRot0 = this.dynamicYRot;
+        this.zRot0 = zRot;
     }
 
     /**
@@ -182,10 +185,12 @@ public class BoxInstance {
             this.instanceNormals[i] = MatrixHelper.transform(correctMatrix, sentinelBox.getNormal(i));
         }
 
-        this.centerVec = MatrixHelper.transform(matrix4f, this.sentinelBox.getBoxOffset().multiply(-1.0F, 1.0F, -1.0F));
+        this.centerVec = MatrixHelper.transform(matrix4f, this.sentinelBox.getBoxOffset().add(0, -this.sentinelBox.getBoxOffset().y, 0).multiply(1.0F, 1.0F, 1.0F));
     }
 
-    public void setRotation(float yRot, float yRot0) {
+    public void setRotation(float xRot, float xRot0, float yRot, float yRot0) {
+        this.xRot = xRot;
+        this.xRot0 = xRot0;
         this.yRot = yRot;
         this.yRot0 = yRot0;
     }
@@ -199,5 +204,17 @@ public class BoxInstance {
         } else {
             return this.sentinelBox == boxInstance.sentinelBox && this.boxOwner.getId() == boxInstance.boxOwner.getId();
         }
+    }
+
+    public record BoxRotation(float xRot, float xRot0, float yRot, float yRot0, float zRot, float zRot0) {
+        public static final StreamCodec<ByteBuf, BoxRotation> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.FLOAT, BoxRotation::xRot,
+                ByteBufCodecs.FLOAT, BoxRotation::xRot0,
+                ByteBufCodecs.FLOAT, BoxRotation::yRot,
+                ByteBufCodecs.FLOAT, BoxRotation::yRot0,
+                ByteBufCodecs.FLOAT, BoxRotation::yRot0,
+                ByteBufCodecs.FLOAT, BoxRotation::yRot0,
+                BoxRotation::new
+        );
     }
 }

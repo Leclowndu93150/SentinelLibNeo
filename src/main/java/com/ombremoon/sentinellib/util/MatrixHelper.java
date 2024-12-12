@@ -38,8 +38,8 @@ public class MatrixHelper {
     public static Matrix4f getEntityMatrix(Entity owner, BoxInstance instance, float partialTicks) {
         Matrix4f matrix4f = new Matrix4f();
         Vec3 pos = owner.position();
-        Matrix4f centerMatrix = new Matrix4f().translate((float) -pos.x, (float) pos.y, (float) -pos.z);
-        matrix4f.mulLocal(centerMatrix.mul0(MatrixHelper.getEntityRotation(owner, instance, partialTicks)));
+        Matrix4f centerMatrix = new Matrix4f().translate((float) pos.x, (float) (pos.y + instance.getSentinelBox().getBoxOffset().y), (float) pos.z);
+        matrix4f.mulLocal(centerMatrix.mul(getEntityRotation( instance, partialTicks)));
         return matrix4f;
     }
 
@@ -47,26 +47,31 @@ public class MatrixHelper {
         SentinelBox box = instance.getSentinelBox();
         Vec3 pos = owner.position();
         Matrix4f matrix4f = new Matrix4f();
-        Matrix4f centerMatrix = new Matrix4f().translate((float) -pos.x, (float) pos.y, (float) -pos.z);
-        matrix4f.mulLocal(centerMatrix.mul0(getEntityRotation(owner, instance, partialTicks)));
+        Matrix4f centerMatrix = new Matrix4f().translate((float) pos.x, (float) pos.y, (float) pos.z);
+        matrix4f.mulLocal(centerMatrix.mul(getEntityRotation(instance, partialTicks)));
         Vec3 path = box.getBoxPath(instance, partialTicks);
-        matrix4f.translate((float) -path.x, (float) path.y, (float) -path.z);
+        matrix4f.translate((float) path.x, (float) path.y, (float) path.z);
         return matrix4f;
     }
 
     /**
      * Returns a 4x4 matrix representing the yaw of an entity
-     * @param livingEntity The entity providing the look angle
      * @param partialTicks The time between ticks
      * @return An identity 4x4 matrix that has been rotated on the y-axis
      */
-    private static Matrix4f getEntityRotation(Entity livingEntity, BoxInstance instance, float partialTicks) {
-        float yRot = livingEntity.level().isClientSide ? instance.yRot : -instance.yRot;
-        float yRot0 = livingEntity.level().isClientSide ? instance.yRot0 : -instance.yRot0;
+    private static Matrix4f getEntityRotation(BoxInstance instance, float partialTicks) {
+        float yRot = -instance.yRot;
+        float yRot0 = -instance.yRot0;
+        float xRot = instance.xRot;
+        float xRot0 = instance.xRot0;
+        float zRot = instance.zRot;
+        float zRot0 = instance.zRot0;
 
         Matrix4f matrix4f = new Matrix4f();
         float yawAmount = Mth.clampedLerp(yRot0, yRot, partialTicks);
-        return matrix4f.rotate(Axis.YP.rotationDegrees(yawAmount));
+        float pitchAmount = Mth.clampedLerp(xRot0, xRot, partialTicks);
+        float rollAmount = Mth.clampedLerp(zRot0, zRot, partialTicks);
+        return matrix4f.rotate(Axis.YP.rotationDegrees(yawAmount)).rotate(Axis.XP.rotationDegrees(pitchAmount)).rotate(Axis.ZP.rotationDegrees(rollAmount));
     }
 
     public static Matrix4f getMovementMatrix(Entity owner, BoxInstance instance, float partialTicks, SentinelBox.MoverType type) {
@@ -92,16 +97,6 @@ public class MatrixHelper {
         }
         return new Matrix4f();
     }*/
-
-    public static Matrix4f getRotatedEntityMatrix(Entity entity, BoxInstance instance, float partialTicks) {
-        float yRot = entity.level().isClientSide ? instance.dynamicYRot : -instance.dynamicYRot;
-        float yRot0 = entity.level().isClientSide ? instance.dynamicYRot0 : -instance.dynamicYRot0;
-
-        Matrix4f matrix4f = new Matrix4f();
-        float yRotation = Mth.clampedLerp(yRot0, yRot, partialTicks);
-        matrix4f.rotate(yRotation * Mth.DEG_TO_RAD, new Vector3f(0.0F, 1.0F, 0.0F));
-        return matrix4f;
-    }
 
     /**
      * Returns a quaternion from a 4x4 matrix. Used for client rendering.

@@ -1,4 +1,3 @@
-/*
 package com.ombremoon.sentinellib.common;
 
 import net.minecraft.world.entity.Entity;
@@ -39,9 +38,8 @@ public interface ISentinelRenderer<T extends Entity & GeoAnimatable & ISentinel>
                 float m32 = spaceMatrix.m32();
                 float m33 = spaceMatrix.m33();
                 Matrix4f matrix = new Matrix4f(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
-                getSentinel().getBoxManager().addBoneMatrix(bone, matrix);
+//                getSentinel().getBoxManager().addBoneMatrix(bone, matrix);
             }
         }
     }
 }
-*/

@@ -27,7 +27,7 @@ public class AABBSentinelBox extends SentinelBox {
     @Override
     public AABB getSentinelBB(BoxInstance instance) {
         Vec3 center = instance.getCenter();
-        return this.aabb.move(-center.x, center.y, -center.z);
+        return this.aabb.move(center.x, center.y, center.z);
     }
 
     public Vec3 getBoxPosition(Entity entity, float partialTicks) {
