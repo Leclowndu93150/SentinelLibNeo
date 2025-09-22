@@ -28,7 +28,7 @@ public class IceMistRenderer extends GeoEntityRenderer<IceMist> implements ISent
     @Override
     protected void applyRotations(IceMist animatable, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTick, float nativeScale) {
         super.applyRotations(animatable, poseStack, ageInTicks, rotationYaw, partialTick, nativeScale);
-        poseStack.mulPose(Axis.YP.rotationDegrees(180));
+        poseStack.mulPose(Axis.YP.rotationDegrees(animatable.getYRot()));
     }
 
     @Override

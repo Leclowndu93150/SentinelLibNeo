@@ -27,7 +27,7 @@ neoForge {
     }
 
     // This line is optional. Access Transformers are automatically detected
-    // accessTransformers.add('src/main/resources/META-INF/accesstransformer.cfg')
+     accessTransformers.from('src/main/resources/META-INF/accesstransformer.cfg')
 
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.
@@ -106,10 +106,10 @@ repositories {
 }
 
 dependencies {
-    compileOnly "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
-    runtimeOnly "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
-    compileOnly "com.eliotlash.mclib:mclib:20"
-    runtimeOnly "com.eliotlash.mclib:mclib:20"
+    implementation "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
+//    runtimeOnly "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
+    implementation "com.eliotlash.mclib:mclib:20"
+//    runtimeOnly "com.eliotlash.mclib:mclib:20"
 }
 
 
@@ -126,7 +126,8 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
                              mod_license            : mod_license,
                              mod_version            : mod_version,
                              mod_authors            : mod_authors,
-                             mod_description        : mod_description]
+                             mod_description        : mod_description
+    ]
     inputs.properties replaceProperties
     expand replaceProperties
     from "src/main/templates"

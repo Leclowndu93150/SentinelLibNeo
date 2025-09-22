@@ -43,3 +43,7 @@
 /summon sentinellib:ice_mist
 /kill @e[type=sentinellib:ice_mist]
 /summon sentinellib:ice_mist
+/kill @e[type=sentinellib:ice_mist]
+/summon sentinellib:ice_mist
+/kill @e[type=sentinellib:ice_mist]
+/summon sentinellib:ice_mist

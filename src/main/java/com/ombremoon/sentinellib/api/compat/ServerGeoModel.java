@@ -21,8 +21,9 @@ import software.bernie.geckolib.util.RenderUtil;
 
 import java.util.Optional;
 
+@SuppressWarnings("unchecked")
 public abstract class ServerGeoModel<T extends GeoSentinel<T>> extends GeoModel<T> {
-    private final AnimationProcessor<T> processor = new AnimationProcessor<>(this);
+    private final ServerAnimationProcessor<T> processor = new ServerAnimationProcessor<>(this);
 
     private BakedGeoModel currentModel = null;
     private double animTime;
@@ -142,17 +143,20 @@ public abstract class ServerGeoModel<T extends GeoSentinel<T>> extends GeoModel<
             return bonePos;
     }*/
 
-    public void handleServerAnimations(T animatable, long instanceId, AnimationState<T> animationState) {
+    public void handleServerAnimations(T animatable, long instanceId, AnimationState<GeoSentinel<T>> animationState) {
         AnimatableManager<T> animatableManager = animatable.getAnimatableInstanceCache().getManagerForId(instanceId);
         Double currentTick = animationState.getData(DataTickets.TICK);
 
+        if (!(animatable instanceof Entity entity))
+            return;
+
         if (currentTick == null)
-            currentTick = animatable instanceof Entity entity ? (double)entity.tickCount : RenderUtil.getCurrentTick();
+            currentTick = (double) entity.tickCount;
 
         if (animatableManager.getFirstTickTime() == -1)
             animatableManager.startedAt(currentTick);
 
-        double currentFrameTime = animatable instanceof Entity || animatable instanceof GeoReplacedEntity ? currentTick : currentTick - animatableManager.getFirstTickTime();
+        double currentFrameTime = animatable instanceof GeoReplacedEntity ? currentTick : currentTick - animatableManager.getFirstTickTime();
         boolean isReRender = !animatableManager.isFirstTick() && currentFrameTime == animatableManager.getLastUpdateTime();
 
         if (isReRender && instanceId == this.lastRenderedInstance)
@@ -168,13 +172,12 @@ public abstract class ServerGeoModel<T extends GeoSentinel<T>> extends GeoModel<
 
         animationState.animationTick = this.animTime;
         this.lastRenderedInstance = instanceId;
-        AnimationProcessor<T> processor = getAnimationProcessor();
 
         processor.preAnimationSetup(animationState, this.animTime);
 
         if (!processor.getRegisteredBones().isEmpty())
-            processor.tickAnimation(animatable, this, animatableManager, this.animTime, animationState, crashIfBoneMissing());
+            processor.tickAnimation(animatable, (GeoModel<GeoSentinel<T>>) this, (AnimatableManager<GeoSentinel<T>>) animatableManager, this.animTime, animationState, crashIfBoneMissing());
 
-        setCustomAnimations(animatable, instanceId, animationState);
+        setCustomAnimations(animatable, instanceId, (AnimationState<T>) animationState);
     }
 }

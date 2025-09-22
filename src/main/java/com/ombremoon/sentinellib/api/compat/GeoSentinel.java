@@ -36,7 +36,7 @@ public interface GeoSentinel<T extends GeoSentinel<T>> extends ISentinel, GeoEnt
             animationState.setData(DataTickets.TICK, animatable.getTick(animatable));
             animationState.setData(DataTickets.ENTITY, entity);
             currentModel.addAdditionalStateData(animatable, instanceId, animationState::setData);
-            currentModel.handleServerAnimations(animatable, instanceId, animationState);
+            currentModel.handleServerAnimations(animatable, instanceId, (AnimationState<GeoSentinel<T>>) animationState);
 
             getSentinelModel().assignBoneMatrices((T) this);
         }
