@@ -8,7 +8,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -38,6 +37,7 @@ public abstract class SentinelBox {
     protected final BiFunction<Entity, LivingEntity, Float> damageFunction;
     private final MoverType moverType;
     private final Int2ObjectOpenHashMap<BiFunction<Integer, Float, Float>> boxMovement;
+    private final Int2ObjectOpenHashMap<BiFunction<Integer, Float, Float>> boxRotation;
     private final Int2ObjectOpenHashMap<Function<Integer, Float>> boxScale;
     private final ScaleDirection scaleDirection;
     private final Vec3[] vertices;
@@ -63,6 +63,7 @@ public abstract class SentinelBox {
         this.damageFunction = builder.damageFunction;
         this.moverType = builder.moverType;
         this.boxMovement = builder.boxMovement;
+        this.boxRotation = builder.boxRotation;
         this.boxScale = builder.boxScale;
         this.scaleDirection = builder.scaleDirection;
         this.vertices = new Vec3[]{new Vec3(vertexPos.x, vertexPos.y, -vertexPos.z), new Vec3(vertexPos.x, vertexPos.y, vertexPos.z), new Vec3(-vertexPos.x, vertexPos.y, vertexPos.z), new Vec3(-vertexPos.x, vertexPos.y, -vertexPos.z)};
@@ -154,11 +155,15 @@ public abstract class SentinelBox {
     }
 
     public BiFunction<Integer, Float, Float> getBoxMovement(MovementAxis axis) {
-        return this.boxMovement.containsKey(axis.ordinal()) ? this.boxMovement.get(axis.ordinal()) : (ticks, partialTicks) -> 0.0F;
+        return this.boxMovement.getOrDefault(axis.ordinal(), (ticks, partialTicks) -> 0.0F);
+    }
+
+    public BiFunction<Integer, Float, Float> getBoxRotation(MovementAxis axis) {
+        return this.boxRotation.getOrDefault(axis.ordinal(), (ticks, partialTicks) -> 0.0F);
     }
 
     public Function<Integer, Float> getBoxScale(MovementAxis axis) {
-        return this.boxScale.containsKey(axis.ordinal()) ? this.boxScale.get(axis.ordinal()) : ticks -> 1.0F;
+        return this.boxScale.getOrDefault(axis.ordinal(), ticks -> 1.0F);
     }
 
     public ScaleDirection getScaleDirection() {
@@ -169,8 +174,16 @@ public abstract class SentinelBox {
         return Vec3.ZERO;
     }
 
+    public Vec3 getBoxAngle(BoxInstance instance, float partialTicks) {
+        return Vec3.ZERO;
+    }
+
     public Vec3 getScaleFactor(BoxInstance instance) {
         return new Vec3(1, 1, 1);
+    }
+
+    public boolean isEntityControlled() {
+        return this.moverType != MoverType.BONE;
     }
 
     public Pair<Float, Float> getYRot(Entity entity) {
@@ -182,7 +195,7 @@ public abstract class SentinelBox {
                     f0 = livingEntity.yBodyRot;
                     f1 = livingEntity.yBodyRotO;
                 }
-                case HEAD, CUSTOM_HEAD -> {
+                case HEAD, HEAD_NO_X, CUSTOM_HEAD -> {
                     f0 = livingEntity.yHeadRot;
                     f1 = livingEntity.yHeadRotO;
                 }
@@ -199,31 +212,39 @@ public abstract class SentinelBox {
     }
 
     public enum MoverType {
-        HEAD(false),
-        BODY(false),
-        CUSTOM(true),
-        CUSTOM_HEAD(true),
-        CUSTOM_BODY(true),
-        BONE(false);
+        HEAD(false, true, true),
+        HEAD_NO_X(false, true, false),
+        BODY(false, false, false),
+        CUSTOM(true, false, false),
+        CUSTOM_HEAD(true, true, false),
+        CUSTOM_BODY(true, false, false),
+        BONE(false, false, false);
 
         private final boolean isDefined;
+        private final boolean followsPitch;
+        private final boolean followsYaw;
 
-        MoverType(boolean isDefined) {
+        MoverType(boolean isDefined, boolean followsPitch, boolean followsYaw) {
             this.isDefined = isDefined;
+            this.followsPitch = followsPitch;
+            this.followsYaw = followsYaw;
         }
 
         public boolean isDefined() {
             return this.isDefined;
         }
+
+        public boolean followsPitch() {
+            return this.followsPitch;
+        }
+
+        public boolean followsYaw() {
+            return this.followsYaw;
+        }
     }
 
     public enum MovementAxis {
-        X_TRANSLATION,
-        Y_TRANSLATION,
-        Z_TRANSLATION,
-        X_ROTATION,
-        Y_ROTATION,
-        Z_ROTATION
+        X, Y, Z
     }
 
     public enum ScaleDirection {
@@ -250,6 +271,7 @@ public abstract class SentinelBox {
         protected BiFunction<Entity, LivingEntity, Float> damageFunction = (entity, living) -> 0F;
         protected MoverType moverType = MoverType.HEAD;
         protected Int2ObjectOpenHashMap<BiFunction<Integer, Float, Float>> boxMovement = new Int2ObjectOpenHashMap<>();
+        protected Int2ObjectOpenHashMap<BiFunction<Integer, Float, Float>> boxRotation = new Int2ObjectOpenHashMap<>();
         protected Int2ObjectOpenHashMap<Function<Integer, Float>> boxScale = new Int2ObjectOpenHashMap<>();
         protected ScaleDirection scaleDirection = ScaleDirection.OUT;
 

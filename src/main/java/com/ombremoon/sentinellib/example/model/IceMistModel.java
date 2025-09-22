@@ -1,6 +1,7 @@
-package com.ombremoon.sentinellib.example;
+package com.ombremoon.sentinellib.example.model;
 
 import com.ombremoon.sentinellib.CommonClass;
+import com.ombremoon.sentinellib.example.entity.IceMist;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib.model.DefaultedEntityGeoModel;

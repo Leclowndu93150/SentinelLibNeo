@@ -14,7 +14,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record ClientboundRemoveSentinelBox(int entityId, String boxName) implements CustomPacketPayload {
     public static final Type<ClientboundRemoveSentinelBox> TYPE = new Type<>(CommonClass.customLocation("remove_box"));
-    public static final StreamCodec<ByteBuf, ClientboundRemoveSentinelBox> CODEC = StreamCodec.composite(
+    public static final StreamCodec<ByteBuf, ClientboundRemoveSentinelBox> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.INT, ClientboundRemoveSentinelBox::entityId,
             ByteBufCodecs.STRING_UTF8, ClientboundRemoveSentinelBox::boxName,
             ClientboundRemoveSentinelBox::new
@@ -27,7 +27,9 @@ public record ClientboundRemoveSentinelBox(int entityId, String boxName) impleme
 
     public static void handle(final ClientboundRemoveSentinelBox payload, final IPayloadContext context) {
         context.enqueueWork(() -> {
-            Level level = Minecraft.getInstance().level;
+            var level = Minecraft.getInstance().level;
+            if (level == null) return;
+
             Entity entity = level.getEntity(payload.entityId());
 
             if (entity == null)

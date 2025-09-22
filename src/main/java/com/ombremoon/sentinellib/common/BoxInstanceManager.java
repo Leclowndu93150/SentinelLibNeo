@@ -13,7 +13,6 @@ import java.util.List;
 public class BoxInstanceManager {
     private final List<BoxInstance> instances = new ObjectArrayList<>();
     private final ISentinel sentinel;
-//    private final Map<GeoBone, Matrix4f> modelMatrices = new Object2ObjectOpenHashMap<>();
 
     public BoxInstanceManager(ISentinel sentinel) {
         this.sentinel = sentinel;
@@ -80,12 +79,4 @@ public class BoxInstanceManager {
     public List<BoxInstance> getInstances() {
         return this.instances;
     }
-
-/*    public void addBoneMatrix(GeoBone bone, Matrix4f matrix4f) {
-        this.modelMatrices.put(bone, matrix4f);
-    }
-
-    public Map<GeoBone, Matrix4f> getBoneMatrix() {
-        return this.modelMatrices;
-    }*/
 }

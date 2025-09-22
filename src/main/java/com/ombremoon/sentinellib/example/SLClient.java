@@ -3,6 +3,7 @@ package com.ombremoon.sentinellib.example;
 import com.ombremoon.sentinellib.CommonClass;
 import com.ombremoon.sentinellib.Constants;
 import com.ombremoon.sentinellib.SentinelLib;
+import com.ombremoon.sentinellib.example.renderer.IceMistRenderer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;

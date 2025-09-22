@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/SentinelLib.main.iml" filepath="$PROJECT_DIR$/.idea/modules/SentinelLib.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/com.ombremoon.SentinelLib.main.iml" filepath="$PROJECT_DIR$/.idea/modules/com.ombremoon.SentinelLib.main.iml" />
     </modules>
   </component>
 </project>

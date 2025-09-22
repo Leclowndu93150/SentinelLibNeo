@@ -2,7 +2,6 @@ package com.ombremoon.sentinellib.api.box;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.ombremoon.sentinellib.Constants;
 import com.ombremoon.sentinellib.common.ISentinel;
 import com.ombremoon.sentinellib.util.MatrixHelper;
 import net.minecraft.resources.ResourceKey;
@@ -27,17 +26,27 @@ public class OBBSentinelBox extends SentinelBox {
     @Override
     public AABB getSentinelBB(BoxInstance instance) {
         Vec3 center = instance.getCenter();
-        return this.aabb.inflate(this.aabb.maxX - this.aabb.minX, this.aabb.maxY - this.aabb.minY, this.aabb.maxZ - this.aabb.minZ).move(center.x, center.y, center.z);
+        float f0 = (float) this.getScaleFactor(instance).x;
+        float f1 = (float) this.getScaleFactor(instance).y;
+        float f2 = (float) this.getScaleFactor(instance).z;
+        return this.aabb.inflate(this.aabb.maxX - this.aabb.minX, this.aabb.maxY - this.aabb.minY, this.aabb.maxZ - this.aabb.minZ).inflate((f0 - 1) * this.aabb.maxX, (f1 - 1) * this.aabb.maxY, (f2 - 1) * this.aabb.maxZ).move(center.x, center.y, center.z);
     }
 
     @Override
     public void renderBox(BoxInstance instance, Entity entity, PoseStack poseStack, VertexConsumer vertexConsumer, float partialTicks, float isRed) {
+        /*if (ADVANCED DEBUG MODE) {
+            poseStack.pushPose();
+            Vec3 center = instance.getCenter();
+            LevelRenderer.renderLineBox(poseStack, vertexConsumer, this.getSentinelBB(instance).move(-center.x, -center.y, -center.z), 1.0F, 1.0F, 1.0F, 1.0F);
+            poseStack.popPose();
+        }*/
+
         Matrix4f transpose = MatrixHelper.getMovementMatrix(entity, instance, partialTicks, this.getMoverType());
         Vec3 offset = this.getBoxOffset();
         poseStack.pushPose();
-        poseStack.translate(0.0F, (float) instance.getSentinelBox().getBoxOffset().y, 0.0F);
+        poseStack.translate(0.0F, (float) offset.y, 0.0F);
         poseStack.mulPose(MatrixHelper.quaternion(transpose).conjugate());
-        poseStack.translate(0.0F, (float) -instance.getSentinelBox().getBoxOffset().y, 0.0F);
+        poseStack.translate(0.0F, (float) -offset.y, 0.0F);
         Matrix4f matrix = poseStack.last().pose();
         if (this.getMoverType().isDefined()) {
             Vec3 vec3 = this.getBoxPath(instance, partialTicks);
@@ -140,17 +149,25 @@ public class OBBSentinelBox extends SentinelBox {
 
     @Override
     public Vec3 getBoxPath(BoxInstance instance, float partialTicks) {
-        float xMovement = this.getBoxMovement(MovementAxis.X_TRANSLATION).apply(instance.tickCount, partialTicks);
-        float yMovement = this.getBoxMovement(MovementAxis.Y_TRANSLATION).apply(instance.tickCount, partialTicks);
-        float zMovement = this.getBoxMovement(MovementAxis.Z_TRANSLATION).apply(instance.tickCount, partialTicks);
+        float xMovement = this.getBoxMovement(MovementAxis.X).apply(instance.tickCount, partialTicks);
+        float yMovement = this.getBoxMovement(MovementAxis.Y).apply(instance.tickCount, partialTicks);
+        float zMovement = this.getBoxMovement(MovementAxis.Z).apply(instance.tickCount, partialTicks);
         return new Vec3(xMovement, yMovement, zMovement);
     }
 
     @Override
+    public Vec3 getBoxAngle(BoxInstance instance, float partialTicks) {
+        float xRotation = this.getBoxRotation(MovementAxis.X).apply(instance.tickCount, partialTicks);
+        float yRotation = this.getBoxRotation(MovementAxis.Y).apply(instance.tickCount, partialTicks);
+        float zRotation = this.getBoxRotation(MovementAxis.Z).apply(instance.tickCount, partialTicks);
+        return new Vec3(xRotation, yRotation, zRotation);
+    }
+
+    @Override
     public Vec3 getScaleFactor(BoxInstance instance) {
-        float xScale = this.getBoxScale(MovementAxis.X_TRANSLATION).apply(instance.tickCount);
-        float yScale = this.getBoxScale(MovementAxis.Y_TRANSLATION).apply(instance.tickCount);
-        float zScale = this.getBoxScale(MovementAxis.Z_TRANSLATION).apply(instance.tickCount);
+        float xScale = this.getBoxScale(MovementAxis.X).apply(instance.tickCount);
+        float yScale = this.getBoxScale(MovementAxis.Y).apply(instance.tickCount);
+        float zScale = this.getBoxScale(MovementAxis.Z).apply(instance.tickCount);
         xScale = this.getScaleDirection() == ScaleDirection.OUT ? xScale : (float) (1 - xScale / this.getVertexPos().x);
         yScale = this.getScaleDirection() == ScaleDirection.OUT ? yScale : (float) (1 - yScale / this.getVertexPos().y);
         zScale = this.getScaleDirection() == ScaleDirection.OUT ? zScale : (float) (1 - zScale / this.getVertexPos().z);
@@ -175,6 +192,11 @@ public class OBBSentinelBox extends SentinelBox {
          * @return The builder
          */
         public static Builder of(String name) { return new Builder(name); }
+
+        public Builder sizeAndOffset(float xSize) {
+            sizeAndOffset(xSize, xSize, 0, 0, 0);
+            return this;
+        }
 
         public Builder sizeAndOffset(float xSize, float xOffset, float yOffset, float zOffset) {
             sizeAndOffset(xSize, xSize, xOffset, yOffset, zOffset);
@@ -330,20 +352,22 @@ public class OBBSentinelBox extends SentinelBox {
         }
 
         public Builder defineMovement(MovementAxis axis, BiFunction<Integer, Float, Float> boxMovement) {
-            if (axis.ordinal() > 2) throw new IllegalArgumentException("Axis must be translational");
             this.boxMovement.put(axis.ordinal(), boxMovement);
             return this;
         }
 
+        public Builder defineRotation(MovementAxis axis, BiFunction<Integer, Float, Float> boxRotation) {
+            this.boxRotation.put(axis.ordinal(), boxRotation);
+            return this;
+        }
+
         public Builder scaleOut(MovementAxis axis, Function<Integer, Float> boxScale) {
-            if (axis.ordinal() > 2) throw new IllegalArgumentException("Axis must be translational");
             this.scaleDirection = ScaleDirection.OUT;
             this.boxScale.put(axis.ordinal(), boxScale);
             return this;
         }
 
         public Builder scaleIn(MovementAxis axis, Function<Integer, Float> boxScale) {
-            if (axis.ordinal() > 2) throw new IllegalArgumentException("Axis must be translational");
             this.scaleDirection = ScaleDirection.IN;
             this.boxScale.put(axis.ordinal(), boxScale);
             return this;

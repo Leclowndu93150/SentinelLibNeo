@@ -1,4 +1,4 @@
-package com.ombremoon.sentinellib.compat;
+package com.ombremoon.sentinellib.api.compat;
 
 import com.ombremoon.sentinellib.api.box.BoxInstance;
 import com.ombremoon.sentinellib.common.BoxInstanceManager;
@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import software.bernie.geckolib.event.GeoRenderEvent;
 
 public class GeoEvents {
@@ -36,8 +37,14 @@ public class GeoEvents {
                 }
             }
 
-//            if (event.getRenderer() instanceof ISentinelRenderer<?> renderer)
-//                renderer.trackSentinelModel(event.getModel());
+            if (event.getRenderer() instanceof ISentinelRenderer<?> renderer)
+                renderer.trackSentinelModel(event.getModel());
         }
+    }
+
+    @SubscribeEvent
+    public void onAddReloadListener(AddReloadListenerEvent event) {
+        event.addListener(new SentinelModelReloadListener());
+        event.addListener(new SentinelAnimationReloadListener());
     }
 }

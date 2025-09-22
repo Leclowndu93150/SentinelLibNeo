@@ -9,12 +9,11 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record ClientboundTriggerSentinelBox(int entityId, String boxName) implements CustomPacketPayload {
     public static final Type<ClientboundTriggerSentinelBox> TYPE = new Type<>(CommonClass.customLocation("trigger_box"));
-    public static final StreamCodec<ByteBuf, ClientboundTriggerSentinelBox> CODEC = StreamCodec.composite(
+    public static final StreamCodec<ByteBuf, ClientboundTriggerSentinelBox> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.INT, ClientboundTriggerSentinelBox::entityId,
             ByteBufCodecs.STRING_UTF8, ClientboundTriggerSentinelBox::boxName,
             ClientboundTriggerSentinelBox::new
@@ -27,7 +26,9 @@ public record ClientboundTriggerSentinelBox(int entityId, String boxName) implem
 
     public static void handle(final ClientboundTriggerSentinelBox payload, final IPayloadContext context) {
         context.enqueueWork(() -> {
-            Level level = Minecraft.getInstance().level;
+            var level = Minecraft.getInstance().level;
+            if (level == null) return;
+
             Entity entity = level.getEntity(payload.entityId());
 
             if (entity == null)

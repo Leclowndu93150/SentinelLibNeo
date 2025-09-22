@@ -8,12 +8,11 @@ import com.ombremoon.sentinellib.common.BoxInstanceManager;
 import com.ombremoon.sentinellib.common.IPlayerSentinel;
 import com.ombremoon.sentinellib.common.ISentinel;
 import com.ombremoon.sentinellib.common.event.RegisterPlayerSentinelBoxEvent;
-import com.ombremoon.sentinellib.compat.GeoEvents;
-import com.ombremoon.sentinellib.example.IceMist;
+import com.ombremoon.sentinellib.api.compat.GeoEvents;
+import com.ombremoon.sentinellib.example.entity.IceMist;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
@@ -40,8 +39,17 @@ CHANGELOG:
 - Fixed Collision Tick
 - Changed typeDamage to BiFunction
 - Added box instance parameter to box specific callbacks
-- Reimplemented Geckolib compat
+- Added additional x/z axis rotation, as well as dynamic rotating sentinel boxes
+- Added dynamic scaling sentinel boxes
+- Finished implementing Geckolib compat
  */
+
+
+/*
+* TODO:
+- Re-implement offset to GeoBone OBBs
+- Finish documentation
+*/
 
 @Mod(Constants.MOD_ID)
 @EventBusSubscriber(modid = Constants.MOD_ID)
@@ -53,14 +61,14 @@ public class SentinelLib {
 
     public static final OBBSentinelBox TEST_ELASTIC = OBBSentinelBox.Builder.of("test")
             .sizeAndOffset(2F, 0.0F, 1, 1.0F)
-            .activeTicks((entity, integer) -> integer > 0)
+            .activeTicks((entity, integer) -> true)
             .boxDuration(100)
             .moverType(SentinelBox.MoverType.CUSTOM_HEAD)
-            .scaleOut(SentinelBox.MovementAxis.X_TRANSLATION, ticks -> Easing.QUAD_IN.easing((float) ticks / 100))
-            .scaleOut(SentinelBox.MovementAxis.Y_TRANSLATION, ticks -> Easing.QUAD_IN.easing((float) ticks / 100))
-            .scaleOut(SentinelBox.MovementAxis.Z_TRANSLATION, ticks -> Easing.QUAD_IN.easing((float) ticks / 100))
-            .defineMovement(SentinelBox.MovementAxis.Z_TRANSLATION, (ticks, partialTicks) -> {
-                return /*Easing.BOUNCE_OUT.easing(3.0F, (float) ticks / 100)*/0F;
+            .scaleOut(SentinelBox.MovementAxis.X, ticks -> Easing.QUAD_IN.easing((float) ticks / 100))
+            .scaleOut(SentinelBox.MovementAxis.Y, ticks -> Easing.QUAD_IN.easing((float) ticks / 100))
+            .scaleOut(SentinelBox.MovementAxis.Z, ticks -> Easing.QUAD_IN.easing((float) ticks / 100))
+            .defineMovement(SentinelBox.MovementAxis.Z, (ticks, partialTicks) -> {
+                return Easing.ELASTIC_OUT.easing(2.0F, (float) ticks / 200);
             })
             .typeDamage(DamageTypes.FREEZE, (entity, living) -> 15F).build();
 
@@ -68,21 +76,14 @@ public class SentinelLib {
             .sizeAndOffset(0.5F, 0, 0.5F, 0)
             .activeTicks((entity, integer) -> integer > 0)
             .boxDuration(100)
-            .moverType(SentinelBox.MoverType.CUSTOM_HEAD)
+            .moverType(SentinelBox.MoverType.CUSTOM)
             .circleMovement(2.0F, 0.15F)
-//            .defineMovement(SentinelBox.MovementAxis.X_TRANSLATION, (ticks, partialTicks) -> {
-//                float f0 = Easing.QUART_IN_OUT.easing((float) (13.3F * Math.PI), (float) ticks / 100);
-//                return 2 * (float) Math.sin(0.15F * f0);
-//            })
-//            .defineMovement(SentinelBox.MovementAxis.Z_TRANSLATION, (ticks, partialTicks) -> {
-//                float f0 = Easing.QUART_IN_OUT.easing((float) (13.3F * Math.PI), (float) ticks / 100);
-//                return 2 * (float) Math.cos(0.15F * f0);
-//            })
             .typeDamage(DamageTypes.FREEZE, (entity, living) -> 15F).build();
 
     public static final OBBSentinelBox BEAM_BOX = OBBSentinelBox.Builder.of("beam")
             .sizeAndOffset(0.3F, 0.3F, 3, 0.0F, 1.7F, 4)
             .noDuration(Entity::isCrouching)
+            .defineRotation(SentinelBox.MovementAxis.Z, (ticks, partialTicks) -> Float.valueOf(ticks))
             .activeTicks((entity, integer) -> integer > 45 && integer % 10 == 0)
             .typeDamage(DamageTypes.FREEZE, (entity, living) -> 15F).build();
 
@@ -131,8 +132,5 @@ public class SentinelLib {
         if (ModList.get().isLoaded("geckolib")) {
             NeoForge.EVENT_BUS.register(GeoEvents.getInstance());
         }
-    }
-
-    public record Renderers<T extends Entity>(Supplier<EntityType<T>> type, EntityRendererProvider<T> renderer) {
     }
 }

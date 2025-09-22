@@ -2,10 +2,12 @@ package com.ombremoon.sentinellib.common;
 
 import com.ombremoon.sentinellib.api.box.BoxInstance;
 import com.ombremoon.sentinellib.api.box.SentinelBox;
+import com.ombremoon.sentinellib.api.compat.ServerGeoModel;
 import com.ombremoon.sentinellib.networking.PayloadHandler;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.level.Level;
 
 import java.util.List;
 
@@ -93,5 +95,13 @@ public interface ISentinel {
      */
     default Entity getSentinel() {
         return (Entity) this;
+    }
+
+    /**
+     * Returns the level of a sentinel
+     * @return The current level
+     */
+    default Level getLevel() {
+        return getSentinel().level();
     }
 }

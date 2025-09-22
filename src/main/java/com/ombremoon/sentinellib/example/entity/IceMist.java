@@ -1,13 +1,17 @@
-package com.ombremoon.sentinellib.example;
+package com.ombremoon.sentinellib.example.entity;
 
+import com.ombremoon.sentinellib.CommonClass;
+import com.ombremoon.sentinellib.Constants;
 import com.ombremoon.sentinellib.SentinelLib;
 import com.ombremoon.sentinellib.api.box.SentinelBox;
+import com.ombremoon.sentinellib.api.compat.GeoSentinel;
+import com.ombremoon.sentinellib.api.compat.ServerGeoModel;
 import com.ombremoon.sentinellib.common.BoxInstanceManager;
-import com.ombremoon.sentinellib.common.ISentinel;
-import com.ombremoon.sentinellib.compat.GeoBoneOBBSentinelBox;
+import com.ombremoon.sentinellib.api.compat.GeoBoneOBBSentinelBox;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
@@ -16,19 +20,20 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.TraceableEntity;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
 import java.util.UUID;
 
-public class IceMist extends Entity implements TraceableEntity, GeoEntity, ISentinel {
+public class IceMist extends Entity implements TraceableEntity, GeoSentinel<IceMist> {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private final BoxInstanceManager manager = new BoxInstanceManager(this);
+    private final IceMistSentinelModel model = new IceMistSentinelModel();
     protected static final RawAnimation MIST = RawAnimation.begin().thenPlay("mist");
     @Nullable
     private LivingEntity owner;
@@ -37,36 +42,14 @@ public class IceMist extends Entity implements TraceableEntity, GeoEntity, ISent
 
     public static final GeoBoneOBBSentinelBox CENTER = GeoBoneOBBSentinelBox.Builder.of("mist_center")
             .sizeAndOffset(0.3125F)
-            .activeTicks((entity, ticks) -> ticks % 20 == 0)
-            .typeDamage(DamageTypes.FREEZE, (entity, livingEntity) -> 2.0F)
-            .scaleOut(ticks -> {
-                if (ticks < 20) {
-                    return 0.0F;
-                } else if (ticks < 60) {
-                    return 0.125F * ticks / 60.0F;
-                } else if (ticks < 320) {
-                    return (ticks / 320.0F);
-                } else {
-                    return 1.0F;
-                }
-            })
+            .activeTicks((entity, ticks) -> true)
+            .typeDamage(DamageTypes.FREEZE, (entity, livingEntity) -> 1.0F)
             .noDuration(Entity::isRemoved).build();
 
     public static final GeoBoneOBBSentinelBox ROT = GeoBoneOBBSentinelBox.Builder.of("mist1")
             .sizeAndOffset(0.375F)
-            .activeTicks((entity, ticks) -> ticks % 20 == 0)
-            .typeDamage(DamageTypes.FREEZE, (entity, livingEntity) -> 2.0F)
-            .scaleOut(ticks -> {
-                if (ticks < 20) {
-                    return 0.0F;
-                } else if (ticks < 60) {
-                    return 0.125F * ticks / 60.0F;
-                } else if (ticks < 320) {
-                    return (ticks / 320.0F);
-                } else {
-                    return 1.0F;
-                }
-            })
+            .activeTicks((entity, ticks) -> true)
+            .typeDamage(DamageTypes.FREEZE, (entity, livingEntity) -> 1.0F)
             .noDuration(Entity::isRemoved).build();
 
     public IceMist(EntityType<?> pEntityType, Level pLevel) {
@@ -95,6 +78,11 @@ public class IceMist extends Entity implements TraceableEntity, GeoEntity, ISent
                 CENTER,
                 ROT
         );
+    }
+
+    @Override
+    public ServerGeoModel<IceMist> getSentinelModel() {
+        return this.model;
     }
 
     public void setOwner(@Nullable LivingEntity pOwner) {
@@ -131,34 +119,44 @@ public class IceMist extends Entity implements TraceableEntity, GeoEntity, ISent
     @Override
     public void tick() {
         tickBoxes();
-//        this.discard();
         super.tick();
-        List<Entity> entityList = this.level().getEntities(this.getOwner(), this.getBoundingBox());
-        for (Entity entity : entityList) {
-            if (entity instanceof LivingEntity livingEntity && this.tickCount % 20 == 0) {
-                livingEntity.hurt(this.level().damageSources().freeze(), 2);
-                //TODO: CHECK
-                livingEntity.setIsInPowderSnow(true);
-            }
+
+        if (this.tickCount >= 100) {
+//            this.discard();
         }
 
-        if (this.tickCount >= 400) {
-            this.discard();
+        if (this.tickCount == 1) {
+            triggerAllSentinelBoxes();
         }
 
-//        if (this.tickCount == 1 && this.level().isClientSide) {
-//            triggerAllSentinelBoxes();
-//            triggerSentinelBox(ROT);
-//        }
+//        this.setYRot(87);
+        if (!level().isClientSide) {
+//            getSentinelModel().getBonePosition(this, "mist1");
+//            Constants.LOG.info("{}", getSentinelModel().getBonePosition(this, "mist_center"));
+            Constants.LOG.info("{}", getSentinelModel().getBone("mist1").get().getWorldPosition());
+        }
     }
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-//        controllers.add(new AnimationController<>(this, "Mist", 0, state -> state.setAndContinue(MIST)));
+        controllers.add(new AnimationController<>(this, "Mist", 0, state -> state.setAndContinue(MIST)));
     }
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return this.cache;
+    }
+
+    public static class IceMistSentinelModel extends ServerGeoModel<IceMist> {
+
+        @Override
+        public ResourceLocation getModelResource(IceMist animatable) {
+            return CommonClass.customLocation("geo_sentinel/entity/ice_mist.json");
+        }
+
+        @Override
+        public ResourceLocation getAnimationResource(IceMist animatable) {
+            return CommonClass.customLocation("sentinel_anim/entity/ice_mist.json");
+        }
     }
 }

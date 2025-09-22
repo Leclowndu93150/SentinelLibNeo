@@ -3,18 +3,30 @@ package com.ombremoon.sentinellib.util;
 import com.mojang.math.Axis;
 import com.ombremoon.sentinellib.api.box.BoxInstance;
 import com.ombremoon.sentinellib.api.box.SentinelBox;
-import com.ombremoon.sentinellib.common.ISentinel;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
-import org.joml.Vector3f;
+import software.bernie.geckolib.cache.object.GeoBone;
 
 /**
  * Utility class used primarily for OBB translations and rotations
  */
 public class MatrixHelper {
+    public static final StreamCodec<ByteBuf, Matrix4f> MATRIX4F = new StreamCodec<>() {
+        @Override
+        public Matrix4f decode(ByteBuf byteBuf) {
+            return readMatrix4f(byteBuf);
+        }
+
+        @Override
+        public void encode(ByteBuf byteBuf, Matrix4f matrix4f) {
+            writeMatrix4f(byteBuf, matrix4f);
+        }
+    };
 
     /**
      * Linear transformation of a 3D vector with a 4x4 matrix
@@ -39,7 +51,7 @@ public class MatrixHelper {
         Matrix4f matrix4f = new Matrix4f();
         Vec3 pos = owner.position();
         Matrix4f centerMatrix = new Matrix4f().translate((float) pos.x, (float) (pos.y + instance.getSentinelBox().getBoxOffset().y), (float) pos.z);
-        matrix4f.mulLocal(centerMatrix.mul(getEntityRotation( instance, partialTicks)));
+        matrix4f.mulLocal(centerMatrix.mul(getBoxRotation(instance, partialTicks)));
         return matrix4f;
     }
 
@@ -48,7 +60,7 @@ public class MatrixHelper {
         Vec3 pos = owner.position();
         Matrix4f matrix4f = new Matrix4f();
         Matrix4f centerMatrix = new Matrix4f().translate((float) pos.x, (float) pos.y, (float) pos.z);
-        matrix4f.mulLocal(centerMatrix.mul(getEntityRotation(instance, partialTicks)));
+        matrix4f.mulLocal(centerMatrix.mul(getBoxRotation(instance, partialTicks)));
         Vec3 path = box.getBoxPath(instance, partialTicks);
         matrix4f.translate((float) path.x, (float) path.y, (float) path.z);
         return matrix4f;
@@ -59,7 +71,7 @@ public class MatrixHelper {
      * @param partialTicks The time between ticks
      * @return An identity 4x4 matrix that has been rotated on the y-axis
      */
-    private static Matrix4f getEntityRotation(BoxInstance instance, float partialTicks) {
+    private static Matrix4f getBoxRotation(BoxInstance instance, float partialTicks) {
         float yRot = -instance.yRot;
         float yRot0 = -instance.yRot0;
         float xRot = instance.xRot;
@@ -79,24 +91,47 @@ public class MatrixHelper {
             case CUSTOM, CUSTOM_BODY, CUSTOM_HEAD -> {
                 return getDynamicEntityMatrix(owner, instance, partialTicks);
             }
-            /*case BONE -> {
-                return getBoneMatrix(owner, instance.getSentinelBox());
-            }*/
+            case BONE -> {
+                return getBoneMatrix(instance, partialTicks);
+            }
             default -> {
                 return getEntityMatrix(owner, instance, partialTicks);
             }
         }
     }
 
-/*    private static Matrix4f getBoneMatrix(Entity owner, SentinelBox sentinelBox) {
-        ISentinel sentinel = (ISentinel) owner;
-        var boneMatrices = sentinel.getBoxManager().getBoneMatrix();
-        for (var entry : boneMatrices.entrySet()) {
-            if (sentinelBox.getName().equalsIgnoreCase(entry.getKey().getName()))
-                return entry.getValue();
+    private static Matrix4f getBoneMatrix(BoxInstance instance, float partialTicks) {
+        Matrix4f matrix4f = new Matrix4f();
+        Vec3 pos = instance.getAnchorPoint();
+        if (pos != null) {
+            Matrix4f centerMatrix = new Matrix4f().translate((float) pos.x, (float) pos.y, (float) pos.z);
+            matrix4f.mulLocal(centerMatrix.mul(getBoxRotation(instance, partialTicks)));
         }
-        return new Matrix4f();
-    }*/
+        return matrix4f;
+    }
+
+    public static void translateMatrixToBone(Matrix4f matrix, GeoBone bone) {
+        matrix.translate(-bone.getPosX() / 16f, bone.getPosY() / 16f, bone.getPosZ() /16f);
+    }
+
+    public static void rotateMatrixAroundBone(Matrix4f matrix, GeoBone bone) {
+        if (bone.getRotZ() != 0)
+            matrix.rotate(Axis.ZP.rotation(bone.getRotZ()));
+
+        if (bone.getRotY() != 0)
+            matrix.rotate(Axis.YP.rotation(bone.getRotY()));
+
+        if (bone.getRotX() != 0)
+            matrix.rotate(Axis.XP.rotation(bone.getRotX()));
+    }
+
+    public static void scaleMatrixForBone(Matrix4f matrix, GeoBone bone) {
+        matrix.scale(bone.getScaleX(), bone.getScaleY(), bone.getScaleZ());
+    }
+
+    public static void translateToPivotPoint(Matrix4f matrix, GeoBone bone) {
+        matrix.translate(bone.getPivotX() / 16f, bone.getPivotY() / 16f, bone.getPivotZ() / 16f);
+    }
 
     /**
      * Returns a quaternion from a 4x4 matrix. Used for client rendering.
@@ -143,4 +178,34 @@ public class MatrixHelper {
         double projection = (endVec.dot(startVec)) / (Mth.square(endVec.x) + Mth.square(endVec.y) + Mth.square(endVec.z));
         return endVec.scale(projection);
     }
+
+    private static Matrix4f readMatrix4f(ByteBuf buffer) {
+        return new Matrix4f(
+                buffer.readFloat(), buffer.readFloat(), buffer.readFloat(), buffer.readFloat(),
+                buffer.readFloat(), buffer.readFloat(), buffer.readFloat(), buffer.readFloat(),
+                buffer.readFloat(), buffer.readFloat(), buffer.readFloat(), buffer.readFloat(),
+                buffer.readFloat(), buffer.readFloat(), buffer.readFloat(), buffer.readFloat()
+        );
+    }
+
+    private static void writeMatrix4f(ByteBuf buffer, Matrix4f matrix4f) {
+        buffer.writeFloat(matrix4f.m00());
+        buffer.writeFloat(matrix4f.m01());
+        buffer.writeFloat(matrix4f.m02());
+        buffer.writeFloat(matrix4f.m03());
+        buffer.writeFloat(matrix4f.m10());
+        buffer.writeFloat(matrix4f.m11());
+        buffer.writeFloat(matrix4f.m12());
+        buffer.writeFloat(matrix4f.m13());
+        buffer.writeFloat(matrix4f.m20());
+        buffer.writeFloat(matrix4f.m21());
+        buffer.writeFloat(matrix4f.m22());
+        buffer.writeFloat(matrix4f.m23());
+        buffer.writeFloat(matrix4f.m30());
+        buffer.writeFloat(matrix4f.m31());
+        buffer.writeFloat(matrix4f.m32());
+        buffer.writeFloat(matrix4f.m33());
+    }
+
+
 }

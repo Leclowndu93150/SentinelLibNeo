@@ -1,6 +1,7 @@
 package com.ombremoon.sentinellib;
 
 import com.ombremoon.sentinellib.api.BoxUtil;
+import com.ombremoon.sentinellib.api.compat.SentinelModelReloadListener;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -15,12 +16,12 @@ public class DebugItem extends Item {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
-        ItemStack itemStack = pPlayer.getItemInHand(pUsedHand);
         if (!pLevel.isClientSide) {
             if (pPlayer.isCrouching()) {
                 BoxUtil.triggerPlayerBox(pPlayer, SentinelLib.TEST_ELASTIC);
             } else {
-                BoxUtil.triggerPlayerBox(pPlayer, SentinelLib.BEAM_BOX);
+//                BoxUtil.triggerPlayerBox(pPlayer, SentinelLib.BEAM_BOX);
+                Constants.LOG.debug("{}", SentinelModelReloadListener.geBakedModels());
             }
         }
         return super.use(pLevel, pPlayer, pUsedHand);

@@ -1,11 +1,12 @@
-package com.ombremoon.sentinellib.compat;
+package com.ombremoon.sentinellib.api.compat;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.ombremoon.sentinellib.api.box.AABBSentinelBox;
+import com.ombremoon.sentinellib.Constants;
 import com.ombremoon.sentinellib.api.box.BoxInstance;
 import com.ombremoon.sentinellib.api.box.OBBSentinelBox;
 import com.ombremoon.sentinellib.util.MatrixHelper;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
@@ -23,18 +24,26 @@ public final class GeoBoneOBBSentinelBox extends OBBSentinelBox {
 
     @Override
     public void renderBox(BoxInstance instance, Entity entity, PoseStack poseStack, VertexConsumer vertexConsumer, float partialTicks, float isRed) {
+        /*if (ADVANCED DEBUG MODE) {
+            poseStack.pushPose();
+            Vec3 center = instance.getCenter();
+            LevelRenderer.renderLineBox(poseStack, vertexConsumer, this.getSentinelBB(instance).move(-center.x, -center.y, -center.z), 1.0F, 1.0F, 1.0F, 1.0F);
+            poseStack.popPose();
+        }*/
+
         Matrix4f transpose = MatrixHelper.getMovementMatrix(entity, instance, partialTicks, MoverType.BONE);
+        Vec3 offset = this.getBoxOffset();
         poseStack.pushPose();
         float x = (float) (transpose.m30() - entity.position().x);
         float y = (float) (transpose.m31() - entity.position().y);
         float z = (float) (transpose.m32() - entity.position().z);
         poseStack.translate(x, y, z);
-        poseStack.mulPose(MatrixHelper.quaternion(transpose.invert()));
+        poseStack.mulPose(MatrixHelper.quaternion(transpose));
+        poseStack.translate(offset.x, offset.y, offset.z);
         Matrix4f matrix = poseStack.last().pose();
         PoseStack.Pose pose = poseStack.last();
         Vec3 scale = this.getScaleFactor(instance);
         Vec3 vertex = this.getVertexPos().multiply(scale.x, scale.y, scale.z);
-        Vec3 offset = this.getBoxOffset();
         float maxX = (float)(offset.x + vertex.x);
         float maxY = (float)(offset.y + vertex.y);
         float maxZ = (float)(offset.z + vertex.z);
@@ -43,6 +52,12 @@ public final class GeoBoneOBBSentinelBox extends OBBSentinelBox {
         float minZ = (float)(offset.z - vertex.z);
         renderBox(vertexConsumer, matrix, minX, minY, minZ, maxX, maxY, maxZ, isRed, pose);
         poseStack.popPose();
+    }
+
+    @Override
+    public Vec3 getScaleFactor(BoxInstance instance) {
+        Vec3 vec3 = instance.getScaleFactor();
+        return vec3 != null ? vec3 : Vec3.ZERO;
     }
 
     public static class Builder extends OBBSentinelBox.Builder {
@@ -59,13 +74,18 @@ public final class GeoBoneOBBSentinelBox extends OBBSentinelBox {
          */
         public static Builder of(String name) { return new Builder(name); }
 
-        public Builder sizeAndOffset(float xVertex) {
-            sizeAndOffset(xVertex, xVertex);
+        public Builder sizeAndOffset(float xSize) {
+            sizeAndOffset(xSize, xSize, 0, 0, 0);
             return this;
         }
 
-        public Builder sizeAndOffset(float xVertex, float yVertex) {
-            sizeAndOffset(xVertex, yVertex, xVertex);
+        public Builder sizeAndOffset(float xSize, float xOffset, float yOffset, float zOffset) {
+            sizeAndOffset(xSize, xSize, xOffset, yOffset, zOffset);
+            return this;
+        }
+
+        public Builder sizeAndOffset(float xzSize, float ySize, float xOffset, float yOffset, float zOffset) {
+            sizeAndOffset(xzSize, ySize, xzSize, xOffset, yOffset, zOffset);
             return this;
         }
 
@@ -76,13 +96,13 @@ public final class GeoBoneOBBSentinelBox extends OBBSentinelBox {
          * @param zVertex The z distance from the center of the box to the top right vertex
          * @return The builder
          */
-        public Builder sizeAndOffset(float xVertex, float yVertex, float zVertex) {
+        public Builder sizeAndOffset(float xVertex, float yVertex, float zVertex, float xOffset, float yOffset, float zOffset) {
             double xSize = Math.abs(xVertex);
             double ySize = Math.abs(yVertex);
             double zSize = Math.abs(zVertex);
             double maxLength = Math.max(xSize, Math.max(ySize, zSize));
             this.vertexPos = new Vec3(xVertex, yVertex, zVertex);
-            this.boxOffset = new Vec3(0, 0, 0);
+            this.boxOffset = new Vec3(xOffset, yOffset, zOffset);
             this.aabb = new AABB(maxLength, maxLength, maxLength, -maxLength, -maxLength, -maxLength);
             return this;
         }
@@ -201,36 +221,6 @@ public final class GeoBoneOBBSentinelBox extends OBBSentinelBox {
         public Builder typeDamage(ResourceKey<DamageType> damageType, BiFunction<Entity, LivingEntity, Float> damageFunction) {
             this.damageType = damageType;
             this.damageFunction = damageFunction;
-            return this;
-        }
-
-        public Builder scaleOut(MovementAxis axis, Function<Integer, Float> boxScale) {
-            if (axis.ordinal() > 2) throw new IllegalArgumentException("Axis must be translational");
-            this.scaleDirection = ScaleDirection.OUT;
-            this.boxScale.put(axis.ordinal(), boxScale);
-            return this;
-        }
-
-        public Builder scaleIn(MovementAxis axis, Function<Integer, Float> boxScale) {
-            if (axis.ordinal() > 2) throw new IllegalArgumentException("Axis must be translational");
-            this.scaleDirection = ScaleDirection.IN;
-            this.boxScale.put(axis.ordinal(), boxScale);
-            return this;
-        }
-
-        public Builder scaleOut(Function<Integer, Float> boxScale) {
-            for (int i = 0; i < 3; i++) {
-                this.scaleDirection = ScaleDirection.OUT;
-                this.boxScale.put(MovementAxis.values()[i].ordinal(), boxScale);
-            }
-            return this;
-        }
-
-        public Builder scaleIn(Function<Integer, Float> boxScale) {
-            for (int i = 0; i < 3; i++) {
-                this.scaleDirection = ScaleDirection.IN;
-                this.boxScale.put(MovementAxis.values()[i].ordinal(), boxScale);
-            }
             return this;
         }
 

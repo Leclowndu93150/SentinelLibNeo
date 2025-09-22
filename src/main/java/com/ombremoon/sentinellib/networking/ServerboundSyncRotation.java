@@ -13,7 +13,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record ServerboundSyncRotation(int entityId, String boxName, BoxInstance.BoxRotation rotation) implements CustomPacketPayload {
     public static final Type<ServerboundSyncRotation> TYPE = new Type<>(CommonClass.customLocation("sync_rotation"));
-    public static final StreamCodec<ByteBuf, ServerboundSyncRotation> CODEC = StreamCodec.composite(
+    public static final StreamCodec<ByteBuf, ServerboundSyncRotation> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.INT, ServerboundSyncRotation::entityId,
             ByteBufCodecs.STRING_UTF8, ServerboundSyncRotation::boxName,
             BoxInstance.BoxRotation.STREAM_CODEC, ServerboundSyncRotation::rotation,
@@ -26,20 +26,22 @@ public record ServerboundSyncRotation(int entityId, String boxName, BoxInstance.
     }
 
     public static void handle(final ServerboundSyncRotation payload, final IPayloadContext context) {
-        context.enqueueWork(() -> {
+//        context.enqueueWork(() -> {
             Level level = context.player().level();
-            Entity entity = level.getEntity(payload.entityId());
+            if (!level.isClientSide) {
+                Entity entity = level.getEntity(payload.entityId());
 
-            if (entity == null)
-                return;
+                if (entity == null)
+                    return;
 
-            if (entity instanceof ISentinel sentinel) {
-                var instance = sentinel.getBoxManager().getBoxInstance(payload.boxName());
-                if (instance != null) {
-                    var rot = payload.rotation;
-                    instance.setRotation(rot.xRot(), rot.xRot0(), rot.yRot(), rot.yRot0());
+                if (entity instanceof ISentinel sentinel) {
+                    var instance = sentinel.getBoxManager().getBoxInstance(payload.boxName());
+                    if (instance != null) {
+                        var rot = payload.rotation;
+                        instance.setRotation(rot.xRot(), rot.xRot0(), rot.yRot(), rot.yRot0());
+                    }
                 }
             }
-        });
+//        });
     }
 }

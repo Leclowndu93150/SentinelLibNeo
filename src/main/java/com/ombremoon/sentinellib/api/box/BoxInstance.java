@@ -5,13 +5,13 @@ import com.ombremoon.sentinellib.api.BoxUtil;
 import com.ombremoon.sentinellib.common.BoxInstanceManager;
 import com.ombremoon.sentinellib.common.ISentinel;
 import com.ombremoon.sentinellib.networking.PayloadHandler;
-import com.ombremoon.sentinellib.networking.ServerboundSyncRotation;
 import com.ombremoon.sentinellib.util.MatrixHelper;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -36,6 +36,10 @@ public class BoxInstance {
     public float yRot0;
     public float zRot;
     public float zRot0;
+    @Nullable
+    private Vec3 anchorPoint;
+    @Nullable
+    private Vec3 scaleFactor;
     private Vec3 centerVec;
     protected Vec3[] instanceVertices;
     protected Vec3[] instanceNormals;
@@ -106,21 +110,26 @@ public class BoxInstance {
         if (this.sentinelBox.getStopPredicate().test(this.boxOwner))
             this.deactivateBox();
 
-        if (this.boxOwner.level().isClientSide) {
-            this.zRot += 2;
+        if (this.sentinelBox.isEntityControlled() && this.boxOwner.level().isClientSide) {
+            var movement = this.getSentinelBox().getMoverType();
+            boolean flag1 = movement.followsYaw();
             var yRot = sentinelBox.getYRot(this.boxOwner);
-            var rot = new BoxRotation(this.boxOwner.getXRot(), this.boxOwner.xRotO, yRot.getFirst(), yRot.getSecond(), 0, 0);
+            float xRot = flag1 ? this.boxOwner.getXRot() : 0;
+            float xRot0 = flag1 ? this.boxOwner.xRotO : 0;
+            var rot = new BoxRotation(xRot, xRot0, yRot.getFirst(), yRot.getSecond(), 0, 0);
             this.setRotation(rot.xRot, rot.xRot0, rot.yRot, rot.yRot0);
             PayloadHandler.syncRotation(this.boxOwner.getId(), this.sentinelBox.getName(), rot);
+        } else if (!this.sentinelBox.isEntityControlled()) {
+            this.xRot0 = xRot;
+            this.yRot0 = yRot;
         }
+        this.zRot0 = zRot;
 
         int duration = this.sentinelBox.getDuration();
         if (!this.sentinelBox.hasDuration() || this.tickCount <= duration) {
             Matrix4f matrix4f = MatrixHelper.getMovementMatrix(this.boxOwner, this, 1.0F, this.sentinelBox.getMoverType());
 
             this.updatePositionAndRotation(matrix4f);
-
-            Constants.LOG.debug("{}", this.getCenter());
 
             if (this.sentinelBox.getActiveDuration().test(this.boxOwner, this.tickCount)) {
                 this.isActive = true;
@@ -133,7 +142,6 @@ public class BoxInstance {
             this.deactivateBox();
         }
         this.sentinelBox.onBoxTick().accept(this.boxOwner, this);
-        this.zRot0 = zRot;
     }
 
     /**
@@ -185,16 +193,35 @@ public class BoxInstance {
             this.instanceNormals[i] = MatrixHelper.transform(correctMatrix, sentinelBox.getNormal(i));
         }
 
-        this.centerVec = MatrixHelper.transform(matrix4f, this.sentinelBox.getBoxOffset().add(0, -this.sentinelBox.getBoxOffset().y, 0).multiply(1.0F, 1.0F, 1.0F));
+        this.centerVec = MatrixHelper.transform(matrix4f, this.sentinelBox.getBoxOffset().add(0, -this.sentinelBox.getBoxOffset().y, 0));
     }
 
     public void setRotation(float xRot, float xRot0, float yRot, float yRot0) {
-        this.xRot = xRot;
-        this.xRot0 = xRot0;
-        this.yRot = yRot;
-        this.yRot0 = yRot0;
+        var angle = this.sentinelBox.getBoxAngle(this, 1.0F);
+
+        this.xRot = (float) (xRot + angle.x);
+        this.xRot0 = (float) (xRot0 + angle.x);
+        this.yRot = (float) (yRot + angle.y);
+        this.yRot0 = (float) (yRot0 + angle.y);
+        this.zRot = (float) angle.z;
     }
-    
+
+    public void setAnchorPoint(@Nullable Vec3 anchorPoint) {
+        this.anchorPoint = anchorPoint;
+    }
+
+    public @Nullable Vec3 getAnchorPoint() {
+        return this.anchorPoint;
+    }
+
+    public void setScaleFactor(@Nullable Vec3 scaleFactor) {
+        this.scaleFactor = scaleFactor;
+    }
+
+    public @Nullable Vec3 getScaleFactor() {
+        return this.scaleFactor;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

@@ -6,10 +6,10 @@ Description: Rendering entity in world
 
 java.util.NoSuchElementException: null
 	at java.base/java.util.List.getFirst(List.java:825) ~[?:?] {re:mixin}
-	at TRANSFORMER/sentinellib@1.1.6/com.ombremoon.sentinellib.example.IceMistRenderer.lambda$renderFinal$0(IceMistRenderer.java:34) ~[%23185!/:?] {re:classloading}
+	at TRANSFORMER/sentinellib@1.1.6/com.ombremoon.sentinellib.example.renderer.IceMistRenderer.lambda$renderFinal$0(IceMistRenderer.java:34) ~[%23185!/:?] {re:classloading}
 	at java.base/java.util.Optional.ifPresent(Optional.java:178) ~[?:?] {}
-	at TRANSFORMER/sentinellib@1.1.6/com.ombremoon.sentinellib.example.IceMistRenderer.renderFinal(IceMistRenderer.java:33) ~[%23185!/:?] {re:classloading}
-	at TRANSFORMER/sentinellib@1.1.6/com.ombremoon.sentinellib.example.IceMistRenderer.renderFinal(IceMistRenderer.java:16) ~[%23185!/:?] {re:classloading}
+	at TRANSFORMER/sentinellib@1.1.6/com.ombremoon.sentinellib.example.renderer.IceMistRenderer.renderFinal(IceMistRenderer.java:33) ~[%23185!/:?] {re:classloading}
+	at TRANSFORMER/sentinellib@1.1.6/com.ombremoon.sentinellib.example.renderer.IceMistRenderer.renderFinal(IceMistRenderer.java:16) ~[%23185!/:?] {re:classloading}
 	at TRANSFORMER/geckolib@4.6.6/software.bernie.geckolib.renderer.GeoRenderer.defaultRender(GeoRenderer.java:152) ~[geckolib-neoforge-1.21.1-4.6.6.jar%23187!/:4.6.6] {re:classloading}
 	at TRANSFORMER/geckolib@4.6.6/software.bernie.geckolib.renderer.GeoEntityRenderer.render(GeoEntityRenderer.java:194) ~[geckolib-neoforge-1.21.1-4.6.6.jar%23187!/:4.6.6] {re:classloading}
 	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.entity.EntityRenderDispatcher.render(EntityRenderDispatcher.java:162) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
@@ -47,10 +47,10 @@ A detailed walkthrough of the error, its code path and all known details is as f
 Thread: Render thread
 Stacktrace:
 	at java.base/java.util.List.getFirst(List.java:825) ~[?:?] {re:mixin}
-	at TRANSFORMER/sentinellib@1.1.6/com.ombremoon.sentinellib.example.IceMistRenderer.lambda$renderFinal$0(IceMistRenderer.java:34) ~[%23185!/:?] {re:classloading}
+	at TRANSFORMER/sentinellib@1.1.6/com.ombremoon.sentinellib.example.renderer.IceMistRenderer.lambda$renderFinal$0(IceMistRenderer.java:34) ~[%23185!/:?] {re:classloading}
 	at java.base/java.util.Optional.ifPresent(Optional.java:178) ~[?:?] {}
-	at TRANSFORMER/sentinellib@1.1.6/com.ombremoon.sentinellib.example.IceMistRenderer.renderFinal(IceMistRenderer.java:33) ~[%23185!/:?] {re:classloading}
-	at TRANSFORMER/sentinellib@1.1.6/com.ombremoon.sentinellib.example.IceMistRenderer.renderFinal(IceMistRenderer.java:16) ~[%23185!/:?] {re:classloading}
+	at TRANSFORMER/sentinellib@1.1.6/com.ombremoon.sentinellib.example.renderer.IceMistRenderer.renderFinal(IceMistRenderer.java:33) ~[%23185!/:?] {re:classloading}
+	at TRANSFORMER/sentinellib@1.1.6/com.ombremoon.sentinellib.example.renderer.IceMistRenderer.renderFinal(IceMistRenderer.java:16) ~[%23185!/:?] {re:classloading}
 	at TRANSFORMER/geckolib@4.6.6/software.bernie.geckolib.renderer.GeoRenderer.defaultRender(GeoRenderer.java:152) ~[geckolib-neoforge-1.21.1-4.6.6.jar%23187!/:4.6.6] {re:classloading}
 	at TRANSFORMER/geckolib@4.6.6/software.bernie.geckolib.renderer.GeoEntityRenderer.render(GeoEntityRenderer.java:194) ~[geckolib-neoforge-1.21.1-4.6.6.jar%23187!/:4.6.6] {re:classloading}
 	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.entity.EntityRenderDispatcher.render(EntityRenderDispatcher.java:162) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A}
@@ -59,7 +59,7 @@ Stacktrace:
 	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.renderer.GameRenderer.renderLevel(GameRenderer.java:1277) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B,pl:runtimedistcleaner:A,re:mixin,pl:accesstransformer:B,pl:runtimedistcleaner:A}
 -- Entity being rendered --
 Details:
-	Entity Type: sentinellib:ice_mist (com.ombremoon.sentinellib.example.IceMist)
+	Entity Type: sentinellib:ice_mist (com.ombremoon.sentinellib.example.entity.IceMist)
 	Entity ID: 630
 	Entity Name: entity.sentinellib.ice_mist
 	Entity's Exact location: 23.84, 64.00, -39.45
@@ -98,7 +98,7 @@ Stacktrace:
 
 -- Renderer details --
 Details:
-	Assigned renderer: com.ombremoon.sentinellib.example.IceMistRenderer@11f63b10
+	Assigned renderer: com.ombremoon.sentinellib.example.renderer.IceMistRenderer@11f63b10
 	Location: -2.79,-2.91,-2.56 - World: (-3,-3,-3), Section: (at 13,13,13 in -1,-1,-1; chunk contains blocks -16,-64,-16 to -1,319,-1), Region: (-1,-1; contains chunks -32,-32 to -1,-1, blocks -512,-64,-512 to -1,319,-1)
 	Rotation: 0.0
 	Delta: 0.86001873
