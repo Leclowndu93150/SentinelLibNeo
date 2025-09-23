@@ -103,13 +103,12 @@ public abstract class ServerGeoModel<T extends GeoSentinel<T>> extends GeoModel<
         MatrixHelper.scaleMatrixForBone(localMatrix, bone);
 
         Matrix4f boneMatrix = bone.getParent() != null ? new Matrix4f(bone.getParent().getLocalSpaceMatrix()) : new Matrix4f();
-        boneMatrix.mul(localMatrix);
+        boneMatrix.mul(localMatrix.invert());
 
-        Matrix4f worldSpaceMatrix = RenderUtil.translateMatrix(new Matrix4f(boneMatrix), sentinel.position().toVector3f());
         bone.setLocalSpaceMatrix(boneMatrix);
-        bone.setWorldSpaceMatrix(worldSpaceMatrix);
+        bone.setWorldSpaceMatrix(RenderUtil.translateMatrix(new Matrix4f(boneMatrix), sentinel.position().toVector3f()));
 
-        MatrixHelper.translateAwayFromPivotPoint(worldSpaceMatrix, bone);
+//        MatrixHelper.translateAwayFromPivotPoint(worldSpaceMatrix, bone);
 
         for (GeoBone geoBone : bone.getChildBones()) {
             setBoneWorldSpaceMatrix(animatable, geoBone);
