@@ -29,6 +29,7 @@ public class BoxInstanceManager {
         for (BoxInstance boxInstance : this.instances) {
             if (boxInstance.equals(instance)) return false;
         }
+
         this.instances.add(instance);
         var yRot = sentinelBox.getYRot(entity);
         float f0 = yRot.getFirst();
@@ -63,9 +64,9 @@ public class BoxInstanceManager {
         return false;
     }
 
-    public BoxInstance getBoxInstance(String boxID) {
+    public BoxInstance getBoxInstance(String boxName) {
         for (BoxInstance instance : this.instances) {
-            if (instance.getSentinelBox().getName().equalsIgnoreCase(boxID)) {
+            if (instance.getSentinelBox().getName().equalsIgnoreCase(boxName)) {
                 return instance;
             }
         }

@@ -28,14 +28,14 @@ public class IceMistRenderer extends GeoEntityRenderer<IceMist> implements ISent
     @Override
     protected void applyRotations(IceMist animatable, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTick, float nativeScale) {
         super.applyRotations(animatable, poseStack, ageInTicks, rotationYaw, partialTick, nativeScale);
-        poseStack.mulPose(Axis.YP.rotationDegrees(animatable.getYRot()));
+//        poseStack.mulPose(Axis.YP.rotationDegrees(180));
     }
 
     @Override
     public void renderRecursively(PoseStack poseStack, IceMist animatable, GeoBone bone, RenderType renderType, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int colour) {
         super.renderRecursively(poseStack, animatable, bone, renderType, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, colour);
 //        Constants.LOG.info("{}", this.entityRenderTranslations);
-//        if (bone.getName().equals("mist5"))
+//        if (bone.getName().equals("mist1"))
 //            Constants.LOG.info("{}", bone.getWorldPosition());
     }
 

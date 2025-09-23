@@ -31,9 +31,9 @@ public final class GeoBoneOBBSentinelBox extends OBBSentinelBox {
             poseStack.popPose();
         }*/
 
+        poseStack.pushPose();
         Matrix4f transpose = MatrixHelper.getMovementMatrix(entity, instance, partialTicks, MoverType.BONE);
         Vec3 offset = this.getBoxOffset();
-        poseStack.pushPose();
         float x = (float) (transpose.m30() - entity.position().x);
         float y = (float) (transpose.m31() - entity.position().y);
         float z = (float) (transpose.m32() - entity.position().z);
