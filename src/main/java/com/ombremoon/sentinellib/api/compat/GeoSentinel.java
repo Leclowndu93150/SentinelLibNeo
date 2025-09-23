@@ -23,10 +23,6 @@ public interface GeoSentinel<T extends GeoSentinel<T>> extends ISentinel, GeoEnt
             Entity entity = getSentinel();
             T animatable = (T) entity;
             BakedGeoModel geoModel = getSentinelModel().getBakedModel(getSentinelModel().getModelResource(animatable));
-
-            if (getSentinelModel().getAnimationProcessor().getRegisteredBones().isEmpty())
-                getSentinelModel().getAnimationProcessor().setActiveModel(geoModel);
-
             Vec3 velocity = entity.getDeltaMovement();
             float avgVelocity = (float)(Math.abs(velocity.x) + Math.abs(velocity.z) / 2f);
             AnimationState<T> animationState = new AnimationState<>(animatable, 0, 0, 0, avgVelocity >= 0.015F);
@@ -36,7 +32,7 @@ public interface GeoSentinel<T extends GeoSentinel<T>> extends ISentinel, GeoEnt
             animationState.setData(DataTickets.TICK, animatable.getTick(animatable));
             animationState.setData(DataTickets.ENTITY, entity);
             currentModel.addAdditionalStateData(animatable, instanceId, animationState::setData);
-            currentModel.handleServerAnimations(animatable, instanceId, (AnimationState<GeoSentinel<T>>) animationState);
+//            currentModel.handleServerAnimations(animatable, instanceId, (AnimationState<GeoSentinel<T>>) animationState);
 
             getSentinelModel().assignBoneMatrices((T) this);
         }

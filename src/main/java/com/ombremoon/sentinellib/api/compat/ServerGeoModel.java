@@ -55,6 +55,11 @@ public abstract class ServerGeoModel<T extends GeoSentinel<T>> extends GeoModel<
     }
 
     @Override
+    public Optional<GeoBone> getBone(String name) {
+        return Optional.ofNullable(this.processor.getBone(name));
+    }
+
+    @Override
     public Animation getAnimation(T animatable, String name) {
         ResourceLocation location = getAnimationResource(animatable);
         BakedAnimations bakedAnimations = SentinelAnimationReloadListener.getBakedAnimations().get(location);
@@ -103,6 +108,8 @@ public abstract class ServerGeoModel<T extends GeoSentinel<T>> extends GeoModel<
         Matrix4f worldSpaceMatrix = RenderUtil.translateMatrix(new Matrix4f(boneMatrix), sentinel.position().toVector3f());
         bone.setLocalSpaceMatrix(boneMatrix);
         bone.setWorldSpaceMatrix(worldSpaceMatrix);
+
+        MatrixHelper.translateAwayFromPivotPoint(worldSpaceMatrix, bone);
 
         for (GeoBone geoBone : bone.getChildBones()) {
             setBoneWorldSpaceMatrix(animatable, geoBone);

@@ -1,5 +1,6 @@
 package com.ombremoon.sentinellib.util;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.ombremoon.sentinellib.api.box.BoxInstance;
 import com.ombremoon.sentinellib.api.box.SentinelBox;
@@ -119,7 +120,7 @@ public class MatrixHelper {
             matrix.rotate(Axis.ZP.rotation(bone.getRotZ()));
 
         if (bone.getRotY() != 0)
-            matrix.rotate(Axis.YP.rotation(bone.getRotY() + 180));
+            matrix.rotate(Axis.YP.rotation(bone.getRotY()));
 
         if (bone.getRotX() != 0)
             matrix.rotate(Axis.XP.rotation(bone.getRotX()));
@@ -131,6 +132,10 @@ public class MatrixHelper {
 
     public static void translateToPivotPoint(Matrix4f matrix, GeoBone bone) {
         matrix.translate(bone.getPivotX() / 16f, bone.getPivotY() / 16f, bone.getPivotZ() / 16f);
+    }
+
+    public static void translateAwayFromPivotPoint(Matrix4f matrix, GeoBone bone) {
+        matrix.translate(-bone.getPivotX() / 16f, -bone.getPivotY() / 16f, -bone.getPivotZ() / 16f);
     }
 
     /**
@@ -206,6 +211,4 @@ public class MatrixHelper {
         buffer.writeFloat(matrix4f.m32());
         buffer.writeFloat(matrix4f.m33());
     }
-
-
 }
