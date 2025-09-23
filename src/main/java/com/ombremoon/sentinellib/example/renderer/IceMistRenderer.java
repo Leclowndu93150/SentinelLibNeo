@@ -34,8 +34,12 @@ public class IceMistRenderer extends GeoEntityRenderer<IceMist> implements ISent
     @Override
     public void renderRecursively(PoseStack poseStack, IceMist animatable, GeoBone bone, RenderType renderType, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int colour) {
         super.renderRecursively(poseStack, animatable, bone, renderType, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, colour);
-//        if (bone.getName().equals("mist7"))
-//            Constants.LOG.info("{}", bone.getWorldPosition());
+        if (animatable.tickCount % 20 == 0 && bone.getName().equals("mist1")) {
+            var bone5 = getGeoModel().getBone("mist5");
+            if (bone5.isPresent()) {
+                Constants.LOG.info("Client - mist1: {} | mist5: {}", bone.getWorldPosition(), bone5.get().getWorldPosition());
+            }
+        }
     }
 
     @Override
