@@ -132,7 +132,7 @@ public class IceMist extends Entity implements TraceableEntity, GeoSentinel<IceM
         if (!level().isClientSide) {
 //            getSentinelModel().getBonePosition(this, "mist1");
 //            Constants.LOG.info("{}", getSentinelModel().getBonePosition(this, "mist_center"));
-            Constants.LOG.info("{}", getSentinelModel().getBone("mist1").get().getWorldPosition());
+//            Constants.LOG.info("{}", getSentinelModel().getBone("mist1").get().getWorldPosition());
 //            Constants.LOG.debug("{}", getSentinelModel().getBone("mist1").get().getRotationVector());
         }
     }

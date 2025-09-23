@@ -2,11 +2,13 @@ package com.ombremoon.sentinellib.api.compat;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.ombremoon.sentinellib.CommonClass;
 import com.ombremoon.sentinellib.Constants;
 import com.ombremoon.sentinellib.api.box.BoxInstance;
 import com.ombremoon.sentinellib.api.box.OBBSentinelBox;
 import com.ombremoon.sentinellib.util.MatrixHelper;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
@@ -14,6 +16,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
+import software.bernie.geckolib.animatable.GeoAnimatable;
+import software.bernie.geckolib.cache.GeckoLibCache;
+import software.bernie.geckolib.cache.object.BakedGeoModel;
+import software.bernie.geckolib.loading.object.BakedModelFactory;
 
 import java.util.function.*;
 
@@ -33,6 +39,10 @@ public final class GeoBoneOBBSentinelBox extends OBBSentinelBox {
 
         poseStack.pushPose();
         Matrix4f transpose = MatrixHelper.getMovementMatrix(entity, instance, partialTicks, MoverType.BONE);
+        Constants.LOG.info("{}", GeckoLibCache.getBakedModels().get(CommonClass.customLocation("geo/entity/ice_mist.geo.json")).getBone("mist1").get().getWorldPosition());
+        var transpose1 = ((GeoSentinel<?>)entity).getSentinelModel().getBone("mist1");
+        if (transpose1.isPresent())
+            Constants.LOG.info("Hi");
         Vec3 offset = this.getBoxOffset();
         float x = (float) (transpose.m30() - entity.position().x);
         float y = (float) (transpose.m31() - entity.position().y);
