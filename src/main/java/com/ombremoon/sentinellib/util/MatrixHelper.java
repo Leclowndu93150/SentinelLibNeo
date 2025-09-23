@@ -119,7 +119,7 @@ public class MatrixHelper {
             matrix.rotate(Axis.ZP.rotation(bone.getRotZ()));
 
         if (bone.getRotY() != 0)
-            matrix.rotate(Axis.YP.rotation(bone.getRotY()));
+            matrix.rotate(Axis.YP.rotation(bone.getRotY() + 180));
 
         if (bone.getRotX() != 0)
             matrix.rotate(Axis.XP.rotation(bone.getRotX()));
