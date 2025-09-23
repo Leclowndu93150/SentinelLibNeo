@@ -129,15 +129,11 @@ public class IceMist extends Entity implements TraceableEntity, GeoSentinel<IceM
             triggerAllSentinelBoxes();
         }
 
-        if (!level().isClientSide && this.tickCount % 20 == 0) {
-            var bone1 = getSentinelModel().getBone("mist1");
-            var bone5 = getSentinelModel().getBone("mist5");
-            if (bone1.isPresent() && bone5.isPresent()) {
-                var rot1 = bone1.get().getParent() != null ? Math.toDegrees(bone1.get().getParent().getRotY()) : 0;
-                var rot5 = bone5.get().getParent() != null ? Math.toDegrees(bone5.get().getParent().getRotY()) : 0;
-                Constants.LOG.info("Server - mist1 (rot1_Y={}°): {} | mist5 (rot5_Y={}°): {}", 
-                    rot1, bone1.get().getWorldPosition(), rot5, bone5.get().getWorldPosition());
-            }
+        if (!level().isClientSide) {
+//            getSentinelModel().getBonePosition(this, "mist1");
+//            Constants.LOG.info("{}", getSentinelModel().getBonePosition(this, "mist_center"));
+//            Constants.LOG.info("{}", getSentinelModel().getBone("mist1").get().getWorldPosition());
+//            Constants.LOG.debug("{}", getSentinelModel().getBone("mist1").get().getRotationVector());
         }
     }
 

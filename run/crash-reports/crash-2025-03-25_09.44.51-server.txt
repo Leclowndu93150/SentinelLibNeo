@@ -1,0 +1,154 @@
+---- Minecraft Crash Report ----
+// Daisy, daisy...
+
+Time: 2025-03-25 09:44:51
+Description: Ticking entity
+
+java.lang.RuntimeException: sentinellib:ice_mist: Invalid model resource path provided - Sentinel model data must be placed in data/<modid>/geo_sentinel/
+	at TRANSFORMER/geckolib@4.6.6/software.bernie.geckolib.GeckoLibConstants.exception(GeckoLibConstants.java:39) ~[geckolib-neoforge-1.21.1-4.6.6.jar%23187!/:4.6.6] {re:classloading}
+	at TRANSFORMER/sentinellib@1.2.0-test/com.ombremoon.sentinellib.api.compat.ServerGeoModel.getBakedModel(ServerGeoModel.java:33) ~[%23185!/:?] {re:classloading}
+	at TRANSFORMER/sentinellib@1.2.0-test/com.ombremoon.sentinellib.example.entity.IceMist.tick(IceMist.java:132) ~[%23185!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.level.ServerLevel.tickNonPassenger(ServerLevel.java:777) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.world.level.Level.guardEntityTick(Level.java:604) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:computing_frames,pl:accesstransformer:B,re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.level.ServerLevel.lambda$tick$2(ServerLevel.java:423) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.world.level.entity.EntityTickList.forEach(EntityTickList.java:53) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.level.ServerLevel.tick(ServerLevel.java:403) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.MinecraftServer.tickChildren(MinecraftServer.java:1052) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.MinecraftServer.tickServer(MinecraftServer.java:932) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.server.IntegratedServer.tickServer(IntegratedServer.java:113) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.MinecraftServer.runServer(MinecraftServer.java:713) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.MinecraftServer.lambda$spin$2(MinecraftServer.java:267) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at java.base/java.lang.Thread.run(Thread.java:1583) [?:?] {}
+
+
+A detailed walkthrough of the error, its code path and all known details is as follows:
+---------------------------------------------------------------------------------------
+
+-- Head --
+Thread: Server thread
+Stacktrace:
+	at TRANSFORMER/geckolib@4.6.6/software.bernie.geckolib.GeckoLibConstants.exception(GeckoLibConstants.java:39) ~[geckolib-neoforge-1.21.1-4.6.6.jar%23187!/:4.6.6] {re:classloading}
+	at TRANSFORMER/sentinellib@1.2.0-test/com.ombremoon.sentinellib.api.compat.ServerGeoModel.getBakedModel(ServerGeoModel.java:33) ~[%23185!/:?] {re:classloading}
+	at TRANSFORMER/sentinellib@1.2.0-test/com.ombremoon.sentinellib.example.entity.IceMist.tick(IceMist.java:132) ~[%23185!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.level.ServerLevel.tickNonPassenger(ServerLevel.java:777) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.world.level.Level.guardEntityTick(Level.java:604) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:computing_frames,pl:accesstransformer:B,re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.level.ServerLevel.lambda$tick$2(ServerLevel.java:423) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.world.level.entity.EntityTickList.forEach(EntityTickList.java:53) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading}
+-- Entity being ticked --
+Details:
+	Entity Type: sentinellib:ice_mist (com.ombremoon.sentinellib.example.entity.IceMist)
+	Entity ID: 12
+	Entity Name: entity.sentinellib.ice_mist
+	Entity's Exact location: 14.06, 64.62, -28.59
+	Entity's Block location: World: (14,64,-29), Section: (at 14,0,3 in 0,4,-2; chunk contains blocks 0,-64,-32 to 15,319,-17), Region: (0,-1; contains chunks 0,-32 to 31,-1, blocks 0,-64,-512 to 511,319,-1)
+	Entity's Momentum: 0.00, 0.00, 0.00
+	Entity's Passengers: []
+	Entity's Vehicle: null
+Stacktrace:
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.world.level.Level.guardEntityTick(Level.java:604) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:computing_frames,pl:accesstransformer:B,re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.level.ServerLevel.lambda$tick$2(ServerLevel.java:423) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.world.level.entity.EntityTickList.forEach(EntityTickList.java:53) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.level.ServerLevel.tick(ServerLevel.java:403) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.MinecraftServer.tickChildren(MinecraftServer.java:1052) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.MinecraftServer.tickServer(MinecraftServer.java:932) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.server.IntegratedServer.tickServer(IntegratedServer.java:113) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.MinecraftServer.runServer(MinecraftServer.java:713) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.MinecraftServer.lambda$spin$2(MinecraftServer.java:267) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at java.base/java.lang.Thread.run(Thread.java:1583) [?:?] {}
+
+
+-- Affected level --
+Details:
+	All players: 1 total; [ServerPlayer['Dev'/105, l='ServerLevel[New World]', x=9.63, y=64.62, z=-26.47]]
+	Chunk stats: 897
+	Level dimension: minecraft:overworld
+	Level spawn location: World: (32,64,-32), Section: (at 0,0,0 in 2,4,-2; chunk contains blocks 32,-64,-32 to 47,319,-17), Region: (0,-1; contains chunks 0,-32 to 31,-1, blocks 0,-64,-512 to 511,319,-1)
+	Level time: 400189 game time, 1166 day time
+	Level name: New World
+	Level game mode: Game mode: creative (ID 1). Hardcore: false. Commands: true
+	Level weather: Rain time: 1 (now: false), thunder time: 1 (now: false)
+	Known server brands: neoforge
+	Removed feature flags: 
+	Level was modded: true
+	Level storage version: 0x04ABD - Anvil
+	Loaded entity count: 105
+Stacktrace:
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.level.ServerLevel.fillReportDetails(ServerLevel.java:1742) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.MinecraftServer.tickChildren(MinecraftServer.java:1055) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.MinecraftServer.tickServer(MinecraftServer.java:932) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.server.IntegratedServer.tickServer(IntegratedServer.java:113) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.MinecraftServer.runServer(MinecraftServer.java:713) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.MinecraftServer.lambda$spin$2(MinecraftServer.java:267) ~[neoforge-21.1.65-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at java.base/java.lang.Thread.run(Thread.java:1583) [?:?] {}
+
+
+-- System Details --
+Details:
+	Minecraft Version: 1.21.1
+	Minecraft Version ID: 1.21.1
+	Operating System: Windows 10 (amd64) version 10.0
+	Java Version: 21.0.3, Oracle Corporation
+	Java VM Version: Java HotSpot(TM) 64-Bit Server VM (mixed mode, sharing), Oracle Corporation
+	Memory: 75325280 bytes (71 MiB) / 887095296 bytes (846 MiB) up to 4276092928 bytes (4078 MiB)
+	CPUs: 16
+	Processor Vendor: AuthenticAMD
+	Processor Name: AMD Ryzen 7 3700X 8-Core Processor             
+	Identifier: AuthenticAMD Family 23 Model 113 Stepping 0
+	Microarchitecture: Zen 2
+	Frequency (GHz): 3.60
+	Number of physical packages: 1
+	Number of physical CPUs: 8
+	Number of logical CPUs: 16
+	Graphics card #0 name: NVIDIA GeForce GTX 1050 Ti
+	Graphics card #0 vendor: NVIDIA
+	Graphics card #0 VRAM (MiB): 4096.00
+	Graphics card #0 deviceId: VideoController1
+	Graphics card #0 versionInfo: 32.0.15.6094
+	Memory slot #0 capacity (MiB): 8192.00
+	Memory slot #0 clockSpeed (GHz): 2.40
+	Memory slot #0 type: DDR4
+	Memory slot #1 capacity (MiB): 8192.00
+	Memory slot #1 clockSpeed (GHz): 2.40
+	Memory slot #1 type: DDR4
+	Virtual memory max (MiB): 57270.25
+	Virtual memory used (MiB): 35656.27
+	Swap memory total (MiB): 40960.00
+	Swap memory used (MiB): 2419.92
+	Space in storage for jna.tmpdir (MiB): <path not set>
+	Space in storage for org.lwjgl.system.SharedLibraryExtractPath (MiB): <path not set>
+	Space in storage for io.netty.native.workdir (MiB): <path not set>
+	Space in storage for java.io.tmpdir (MiB): available: 78098.63, total: 476322.34
+	Space in storage for workdir (MiB): available: 78098.63, total: 476322.34
+	JVM Flags: 0 total; 
+	Server Running: true
+	Player Count: 1 / 8; [ServerPlayer['Dev'/105, l='ServerLevel[New World]', x=9.63, y=64.62, z=-26.47]]
+	Active Data Packs: vanilla, mod_data, mod/geckolib, mod/sentinellib, mod/neoforge
+	Available Data Packs: bundle, trade_rebalance, vanilla, mod/geckolib, mod/neoforge, mod/sentinellib, mod_data
+	Enabled Feature Flags: minecraft:vanilla
+	World Generation: Stable
+	World Seed: -431688299145880127
+	Type: Integrated Server (map_client.txt)
+	Is Modded: Definitely; Client brand changed to 'neoforge'; Server brand changed to 'neoforge'
+	Launched Version: 21.1.65
+	ModLauncher: 11.0.4+main.d2e20e43
+	ModLauncher launch target: forgeclientuserdev
+	ModLauncher services: 
+		sponge-mixin-0.15.2+mixin.0.8.7.jar mixin PLUGINSERVICE 
+		loader-4.0.24.jar slf4jfixer PLUGINSERVICE 
+		loader-4.0.24.jar runtime_enum_extender PLUGINSERVICE 
+		at-modlauncher-10.0.1.jar accesstransformer PLUGINSERVICE 
+		loader-4.0.24.jar runtimedistcleaner PLUGINSERVICE 
+		modlauncher-11.0.4.jar mixin TRANSFORMATIONSERVICE 
+		modlauncher-11.0.4.jar fml TRANSFORMATIONSERVICE 
+	FML Language Providers: 
+		javafml@4.0
+		lowcodefml@4.0
+		minecraft@4.0
+	Mod List: 
+		neoforge-21.1.65-minecraft-merged.jar             |Minecraft                     |minecraft                     |1.21.1              |Manifest: NOSIGNATURE
+		geckolib-neoforge-1.21.1-4.6.6.jar                |GeckoLib 4                    |geckolib                      |4.6.6               |Manifest: NOSIGNATURE
+		main                                              |SentinelLib                   |sentinellib                   |1.2.0-test          |Manifest: NOSIGNATURE
+		neoforge-21.1.65-minecraft-merged.jar             |NeoForge                      |neoforge                      |21.1.65             |Manifest: NOSIGNATURE
+	Crash Report UUID: c153794d-9061-4f0b-8b2a-26790b578011
+	FML: 4.0.24
+	NeoForge: 21.1.65

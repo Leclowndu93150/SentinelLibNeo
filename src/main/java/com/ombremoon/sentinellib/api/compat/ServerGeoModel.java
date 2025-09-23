@@ -90,49 +90,27 @@ public abstract class ServerGeoModel<T extends GeoSentinel<T>> extends GeoModel<
 
     public void assignBoneMatrices(T animatable) {
         BakedGeoModel model = getBakedModel(getModelResource(animatable));
-        Entity sentinel = animatable.getSentinel();
-        
-        Matrix4f entityRenderTranslations = new Matrix4f();
-        Matrix4f modelRenderTranslations = new Matrix4f();
-        modelRenderTranslations.translate(0, 0.01f, 0);
-        
         for (GeoBone bone : model.topLevelBones()) {
-            resetBoneToInitialState(bone);
-            processGeoBone(animatable, bone, new Matrix4f(), entityRenderTranslations, modelRenderTranslations);
-        }
-    }
-    
-    private void resetBoneToInitialState(GeoBone bone) {
-        bone.updateRotation(bone.getInitialSnapshot().getRotX(), bone.getInitialSnapshot().getRotY(), bone.getInitialSnapshot().getRotZ());
-        bone.updatePosition(bone.getInitialSnapshot().getOffsetX(), bone.getInitialSnapshot().getOffsetY(), bone.getInitialSnapshot().getOffsetZ());
-        bone.updateScale(bone.getInitialSnapshot().getScaleX(), bone.getInitialSnapshot().getScaleY(), bone.getInitialSnapshot().getScaleZ());
-        
-        for (GeoBone child : bone.getChildBones()) {
-            resetBoneToInitialState(child);
+            setBoneWorldSpaceMatrix(animatable, bone);
         }
     }
 
-    private void processGeoBone(T animatable, GeoBone bone, Matrix4f parentTransform, Matrix4f entityRenderTranslations, Matrix4f modelRenderTranslations) {
+    public void setBoneWorldSpaceMatrix(T animatable, GeoBone bone) {
         Entity sentinel = animatable.getSentinel();
-        
-        Matrix4f boneTransform = new Matrix4f(parentTransform);
-        
-        MatrixHelper.translateMatrixToBone(boneTransform, bone);
-        MatrixHelper.translateToPivotPoint(boneTransform, bone);
-        MatrixHelper.rotateMatrixAroundBone(boneTransform, bone);
-        MatrixHelper.scaleMatrixForBone(boneTransform, bone);
-        
-        Matrix4f poseState = new Matrix4f(boneTransform);
-        Matrix4f localMatrix = RenderUtil.invertAndMultiplyMatrices(poseState, entityRenderTranslations);
-        
-        bone.setModelSpaceMatrix(RenderUtil.invertAndMultiplyMatrices(poseState, modelRenderTranslations));
-        bone.setLocalSpaceMatrix(localMatrix);
-        bone.setWorldSpaceMatrix(RenderUtil.translateMatrix(new Matrix4f(localMatrix), sentinel.position().toVector3f()));
-        
-        MatrixHelper.translateAwayFromPivotPoint(boneTransform, bone);
-        
-        for (GeoBone child : bone.getChildBones()) {
-            processGeoBone(animatable, child, boneTransform, entityRenderTranslations, modelRenderTranslations);
+        Matrix4f localMatrix = new Matrix4f();
+        MatrixHelper.translateMatrixToBone(localMatrix, bone);
+        MatrixHelper.translateToPivotPoint(localMatrix, bone);
+        MatrixHelper.rotateMatrixAroundBone(localMatrix, bone);
+        MatrixHelper.scaleMatrixForBone(localMatrix, bone);
+
+        Matrix4f boneMatrix = bone.getParent() != null ? new Matrix4f(bone.getParent().getLocalSpaceMatrix()) : new Matrix4f();
+        Matrix4f worldSpaceMatrix = RenderUtil.translateMatrix(new Matrix4f(boneMatrix), sentinel.position().toVector3f());
+
+        bone.setLocalSpaceMatrix(boneMatrix);
+        bone.setWorldSpaceMatrix(worldSpaceMatrix);
+
+        for (GeoBone geoBone : bone.getChildBones()) {
+            setBoneWorldSpaceMatrix(animatable, geoBone);
         }
     }
 

@@ -31,10 +31,6 @@ public class PayloadHandler {
         PacketDistributor.sendToServer(new ServerboundSyncGeoBone(entityID, boxId, posVector, rotVector, scaleVector));
     }
 
-    public static void syncGeoBoneToClients(int entityID, String boxId, Vector3f posVector, Vector3f rotVector, Vector3f scaleVector) {
-        PacketDistributor.sendToAllPlayers(new ClientboundSyncGeoBone(entityID, boxId, posVector, rotVector, scaleVector));
-    }
-
     @SubscribeEvent
     public static void register(final RegisterPayloadHandlersEvent event) {
         final PayloadRegistrar registrar = event.registrar("1").optional();
@@ -58,11 +54,6 @@ public class PayloadHandler {
                 ClientboundRemoveSentinelBox.TYPE,
                 ClientboundRemoveSentinelBox.STREAM_CODEC,
                 ClientboundRemoveSentinelBox::handle
-        );
-        registrar.playToClient(
-                ClientboundSyncGeoBone.TYPE,
-                ClientboundSyncGeoBone.STREAM_CODEC,
-                ClientboundSyncGeoBone::handle
         );
     }
 }

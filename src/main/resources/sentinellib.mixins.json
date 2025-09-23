@@ -5,11 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "refmap": "sentinellib.refmap.json",
   "mixins": [
-    "BakedModelFactoryMixin",
-    "DuckPlayerMixin",
-    "GeoBoneMixin",
-    "RenderUtilMixin",
-    "ServerGeoModelMixin"
+    "DuckPlayerMixin"
   ],
   "client": [
   ],

@@ -1,0 +1,106 @@
+---- Minecraft Crash Report ----
+// Why did you do that?
+
+Time: 2024-10-04 16:49:53
+Description: Mod loading failures have occurred; consult the issue messages for more details
+
+net.neoforged.neoforge.logging.CrashReportExtender$ModLoadingCrashException: Mod loading has failed
+
+
+A detailed walkthrough of the error, its code path and all known details is as follows:
+---------------------------------------------------------------------------------------
+
+-- Head --
+Thread: Render thread
+Stacktrace:
+	at MC-BOOTSTRAP/net.neoforged.bus/net.neoforged.bus.EventBus.register(EventBus.java:115) ~[bus-8.0.1.jar%23143!/:?] {}
+-- Mod loading issue for: sentinellib --
+Details:
+	Mod file: /C:/Users/Bryce/Documents/Mods/untitled/build/classes/java/main/
+	Failure message: SentinelLib (sentinellib) has failed to load correctly
+		java.lang.IllegalArgumentException: class com.ombremoon.sentinellib.SentinelLib has no @SubscribeEvent methods, but register was called anyway.
+		The event bus only recognizes listener methods that have the @SubscribeEvent annotation.
+		
+	Mod version: 1.0-SNAPSHOT
+	Mod issues URL: <No issues URL found>
+	Exception message: java.lang.IllegalArgumentException: class com.ombremoon.sentinellib.SentinelLib has no @SubscribeEvent methods, but register was called anyway.
+The event bus only recognizes listener methods that have the @SubscribeEvent annotation.
+
+Stacktrace:
+	at MC-BOOTSTRAP/net.neoforged.bus/net.neoforged.bus.EventBus.register(EventBus.java:115) ~[bus-8.0.1.jar%23143!/:?] {}
+	at MC-BOOTSTRAP/fml_loader@4.0.24/net.neoforged.fml.javafmlmod.AutomaticEventSubscriber.lambda$inject$4(AutomaticEventSubscriber.java:60) ~[loader-4.0.24.jar%23139!/:4.0] {}
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[?:?] {}
+	at MC-BOOTSTRAP/fml_loader@4.0.24/net.neoforged.fml.javafmlmod.AutomaticEventSubscriber.inject(AutomaticEventSubscriber.java:44) ~[loader-4.0.24.jar%23139!/:4.0] {}
+	at MC-BOOTSTRAP/fml_loader@4.0.24/net.neoforged.fml.javafmlmod.FMLModContainer.constructMod(FMLModContainer.java:126) ~[loader-4.0.24.jar%23139!/:4.0] {}
+	at MC-BOOTSTRAP/fml_loader@4.0.24/net.neoforged.fml.ModLoader.lambda$constructMods$3(ModLoader.java:153) ~[loader-4.0.24.jar%23139!/:4.0] {}
+	at MC-BOOTSTRAP/fml_loader@4.0.24/net.neoforged.fml.ModLoader.lambda$dispatchParallelTask$7(ModLoader.java:231) ~[loader-4.0.24.jar%23139!/:4.0] {}
+	at java.base/java.util.concurrent.CompletableFuture.uniHandle(CompletableFuture.java:934) ~[?:?] {}
+	at java.base/java.util.concurrent.CompletableFuture$UniHandle.tryFire(CompletableFuture.java:911) ~[?:?] {}
+	at java.base/java.util.concurrent.CompletableFuture$Completion.exec(CompletableFuture.java:483) ~[?:?] {}
+	at java.base/java.util.concurrent.ForkJoinTask.doExec$$$capture(ForkJoinTask.java:387) ~[?:?] {}
+	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java) ~[?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1312) ~[?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1843) ~[?:?] {}
+	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1808) ~[?:?] {}
+	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:188) ~[?:?] {}
+
+
+-- System Details --
+Details:
+	Minecraft Version: 1.21.1
+	Minecraft Version ID: 1.21.1
+	Operating System: Windows 10 (amd64) version 10.0
+	Java Version: 21.0.3, Oracle Corporation
+	Java VM Version: Java HotSpot(TM) 64-Bit Server VM (mixed mode, sharing), Oracle Corporation
+	Memory: 232742768 bytes (221 MiB) / 616562688 bytes (588 MiB) up to 4276092928 bytes (4078 MiB)
+	CPUs: 16
+	Processor Vendor: AuthenticAMD
+	Processor Name: AMD Ryzen 7 3700X 8-Core Processor             
+	Identifier: AuthenticAMD Family 23 Model 113 Stepping 0
+	Microarchitecture: Zen 2
+	Frequency (GHz): 3.60
+	Number of physical packages: 1
+	Number of physical CPUs: 8
+	Number of logical CPUs: 16
+	Graphics card #0 name: NVIDIA GeForce GTX 1050 Ti
+	Graphics card #0 vendor: NVIDIA
+	Graphics card #0 VRAM (MiB): 4096.00
+	Graphics card #0 deviceId: VideoController1
+	Graphics card #0 versionInfo: 31.0.15.3623
+	Memory slot #0 capacity (MiB): 8192.00
+	Memory slot #0 clockSpeed (GHz): 2.40
+	Memory slot #0 type: DDR4
+	Memory slot #1 capacity (MiB): 8192.00
+	Memory slot #1 clockSpeed (GHz): 2.40
+	Memory slot #1 type: DDR4
+	Virtual memory max (MiB): 44982.25
+	Virtual memory used (MiB): 22873.53
+	Swap memory total (MiB): 28672.00
+	Swap memory used (MiB): 1171.00
+	Space in storage for jna.tmpdir (MiB): <path not set>
+	Space in storage for org.lwjgl.system.SharedLibraryExtractPath (MiB): <path not set>
+	Space in storage for io.netty.native.workdir (MiB): <path not set>
+	Space in storage for java.io.tmpdir (MiB): available: 36976.98, total: 476322.34
+	Space in storage for workdir (MiB): available: 36976.98, total: 476322.34
+	JVM Flags: 0 total; 
+	ModLauncher: 11.0.4+main.d2e20e43
+	ModLauncher launch target: forgeclientuserdev
+	ModLauncher services: 
+		sponge-mixin-0.15.2+mixin.0.8.7.jar mixin PLUGINSERVICE 
+		loader-4.0.24.jar slf4jfixer PLUGINSERVICE 
+		loader-4.0.24.jar runtime_enum_extender PLUGINSERVICE 
+		at-modlauncher-10.0.1.jar accesstransformer PLUGINSERVICE 
+		loader-4.0.24.jar runtimedistcleaner PLUGINSERVICE 
+		modlauncher-11.0.4.jar mixin TRANSFORMATIONSERVICE 
+		modlauncher-11.0.4.jar fml TRANSFORMATIONSERVICE 
+	FML Language Providers: 
+		javafml@4.0
+		lowcodefml@4.0
+		minecraft@4.0
+	Mod List: 
+		neoforge-21.1.50-minecraft-merged.jar             |Minecraft                     |minecraft                     |1.21.1              |Manifest: NOSIGNATURE
+		main                                              |SentinelLib                   |sentinellib                   |1.0-SNAPSHOT        |Manifest: NOSIGNATURE
+		neoforge-21.1.50-minecraft-merged.jar             |NeoForge                      |neoforge                      |21.1.50             |Manifest: NOSIGNATURE
+	Crash Report UUID: f253da9e-1d48-47c0-b6b7-2426d7c24167
+	FML: 4.0.24
+	NeoForge: 21.1.50

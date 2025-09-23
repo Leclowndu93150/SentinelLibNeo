@@ -1,0 +1,127 @@
+---- Minecraft Crash Report ----
+// Who set us up the TNT?
+
+Time: 2024-10-04 16:52:47
+Description: Ticking player
+
+java.lang.ClassCastException: class net.minecraft.server.level.ServerPlayer cannot be cast to class com.ombremoon.sentinellib.common.IPlayerSentinel (net.minecraft.server.level.ServerPlayer is in module minecraft@1.21.1 of loader 'TRANSFORMER' @ebda593; com.ombremoon.sentinellib.common.IPlayerSentinel is in module sentinellib@1.0-SNAPSHOT of loader 'TRANSFORMER' @ebda593)
+	at TRANSFORMER/sentinellib@1.0-SNAPSHOT/com.ombremoon.sentinellib.SentinelLib.tickPlayerBoxes(SentinelLib.java:102) ~[%23185!/:?] {re:classloading}
+	at MC-BOOTSTRAP/net.neoforged.bus/net.neoforged.bus.EventBus.post(EventBus.java:350) ~[bus-8.0.1.jar%23143!/:?] {}
+	at MC-BOOTSTRAP/net.neoforged.bus/net.neoforged.bus.EventBus.post(EventBus.java:315) ~[bus-8.0.1.jar%23143!/:?] {}
+	at TRANSFORMER/neoforge@21.1.50/net.neoforged.neoforge.event.EventHooks.firePlayerTickPost(EventHooks.java:962) ~[neoforge-21.1.50-minecraft-merged.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.world.entity.player.Player.tick(Player.java:335) ~[neoforge-21.1.50-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.level.ServerPlayer.doTick(ServerPlayer.java:571) ~[neoforge-21.1.50-minecraft-merged.jar%23183!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.network.ServerGamePacketListenerImpl.tick(ServerGamePacketListenerImpl.java:266) ~[neoforge-21.1.50-minecraft-merged.jar%23183!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.network.Connection.tick(Connection.java:421) ~[neoforge-21.1.50-minecraft-merged.jar%23183!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.network.ServerConnectionListener.tick(ServerConnectionListener.java:174) ~[neoforge-21.1.50-minecraft-merged.jar%23183!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.MinecraftServer.tickChildren(MinecraftServer.java:1066) ~[neoforge-21.1.50-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.MinecraftServer.tickServer(MinecraftServer.java:932) ~[neoforge-21.1.50-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.server.IntegratedServer.tickServer(IntegratedServer.java:113) ~[neoforge-21.1.50-minecraft-merged.jar%23183!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.MinecraftServer.runServer(MinecraftServer.java:713) ~[neoforge-21.1.50-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.MinecraftServer.lambda$spin$2(MinecraftServer.java:267) ~[neoforge-21.1.50-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at java.base/java.lang.Thread.run(Thread.java:1583) [?:?] {}
+
+
+A detailed walkthrough of the error, its code path and all known details is as follows:
+---------------------------------------------------------------------------------------
+
+-- Head --
+Thread: Server thread
+Stacktrace:
+	at TRANSFORMER/sentinellib@1.0-SNAPSHOT/com.ombremoon.sentinellib.SentinelLib.tickPlayerBoxes(SentinelLib.java:102) ~[%23185!/:?] {re:classloading}
+	at MC-BOOTSTRAP/net.neoforged.bus/net.neoforged.bus.EventBus.post(EventBus.java:350) ~[bus-8.0.1.jar%23143!/:?] {}
+	at MC-BOOTSTRAP/net.neoforged.bus/net.neoforged.bus.EventBus.post(EventBus.java:315) ~[bus-8.0.1.jar%23143!/:?] {}
+	at TRANSFORMER/neoforge@21.1.50/net.neoforged.neoforge.event.EventHooks.firePlayerTickPost(EventHooks.java:962) ~[neoforge-21.1.50-minecraft-merged.jar%23184!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.world.entity.player.Player.tick(Player.java:335) ~[neoforge-21.1.50-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+-- Player being ticked --
+Details:
+	Entity Type: minecraft:player (net.minecraft.server.level.ServerPlayer)
+	Entity ID: 27
+	Entity Name: Dev
+	Entity's Exact location: 31.50, 69.00, -34.50
+	Entity's Block location: World: (31,69,-35), Section: (at 15,5,13 in 1,4,-3; chunk contains blocks 16,-64,-48 to 31,319,-33), Region: (0,-1; contains chunks 0,-32 to 31,-1, blocks 0,-64,-512 to 511,319,-1)
+	Entity's Momentum: 0.00, -0.08, 0.00
+	Entity's Passengers: []
+	Entity's Vehicle: null
+Stacktrace:
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.level.ServerPlayer.doTick(ServerPlayer.java:571) ~[neoforge-21.1.50-minecraft-merged.jar%23183!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.network.ServerGamePacketListenerImpl.tick(ServerGamePacketListenerImpl.java:266) ~[neoforge-21.1.50-minecraft-merged.jar%23183!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.network.Connection.tick(Connection.java:421) ~[neoforge-21.1.50-minecraft-merged.jar%23183!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.network.ServerConnectionListener.tick(ServerConnectionListener.java:174) ~[neoforge-21.1.50-minecraft-merged.jar%23183!/:?] {re:classloading}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.MinecraftServer.tickChildren(MinecraftServer.java:1066) ~[neoforge-21.1.50-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.MinecraftServer.tickServer(MinecraftServer.java:932) ~[neoforge-21.1.50-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.client.server.IntegratedServer.tickServer(IntegratedServer.java:113) ~[neoforge-21.1.50-minecraft-merged.jar%23183!/:?] {re:classloading,pl:runtimedistcleaner:A}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.MinecraftServer.runServer(MinecraftServer.java:713) ~[neoforge-21.1.50-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at TRANSFORMER/minecraft@1.21.1/net.minecraft.server.MinecraftServer.lambda$spin$2(MinecraftServer.java:267) ~[neoforge-21.1.50-minecraft-merged.jar%23183!/:?] {re:classloading,pl:accesstransformer:B}
+	at java.base/java.lang.Thread.run(Thread.java:1583) [?:?] {}
+
+
+-- System Details --
+Details:
+	Minecraft Version: 1.21.1
+	Minecraft Version ID: 1.21.1
+	Operating System: Windows 10 (amd64) version 10.0
+	Java Version: 21.0.3, Oracle Corporation
+	Java VM Version: Java HotSpot(TM) 64-Bit Server VM (mixed mode, sharing), Oracle Corporation
+	Memory: 69706280 bytes (66 MiB) / 855638016 bytes (816 MiB) up to 4276092928 bytes (4078 MiB)
+	CPUs: 16
+	Processor Vendor: AuthenticAMD
+	Processor Name: AMD Ryzen 7 3700X 8-Core Processor             
+	Identifier: AuthenticAMD Family 23 Model 113 Stepping 0
+	Microarchitecture: Zen 2
+	Frequency (GHz): 3.60
+	Number of physical packages: 1
+	Number of physical CPUs: 8
+	Number of logical CPUs: 16
+	Graphics card #0 name: NVIDIA GeForce GTX 1050 Ti
+	Graphics card #0 vendor: NVIDIA
+	Graphics card #0 VRAM (MiB): 4096.00
+	Graphics card #0 deviceId: VideoController1
+	Graphics card #0 versionInfo: 31.0.15.3623
+	Memory slot #0 capacity (MiB): 8192.00
+	Memory slot #0 clockSpeed (GHz): 2.40
+	Memory slot #0 type: DDR4
+	Memory slot #1 capacity (MiB): 8192.00
+	Memory slot #1 clockSpeed (GHz): 2.40
+	Memory slot #1 type: DDR4
+	Virtual memory max (MiB): 44982.25
+	Virtual memory used (MiB): 23268.02
+	Swap memory total (MiB): 28672.00
+	Swap memory used (MiB): 1185.56
+	Space in storage for jna.tmpdir (MiB): <path not set>
+	Space in storage for org.lwjgl.system.SharedLibraryExtractPath (MiB): <path not set>
+	Space in storage for io.netty.native.workdir (MiB): <path not set>
+	Space in storage for java.io.tmpdir (MiB): available: 36972.82, total: 476322.34
+	Space in storage for workdir (MiB): available: 36972.82, total: 476322.34
+	JVM Flags: 0 total; 
+	Server Running: true
+	Player Count: 1 / 8; [ServerPlayer['Dev'/27, l='ServerLevel[New World]', x=31.50, y=69.00, z=-34.50]]
+	Active Data Packs: vanilla, mod_data, mod/sentinellib, mod/neoforge
+	Available Data Packs: bundle, trade_rebalance, vanilla, mod/neoforge, mod/sentinellib, mod_data
+	Enabled Feature Flags: minecraft:vanilla
+	World Generation: Stable
+	World Seed: -431688299145880127
+	Type: Integrated Server (map_client.txt)
+	Is Modded: Definitely; Client brand changed to 'neoforge'; Server brand changed to 'neoforge'
+	Launched Version: 21.1.50
+	ModLauncher: 11.0.4+main.d2e20e43
+	ModLauncher launch target: forgeclientuserdev
+	ModLauncher services: 
+		sponge-mixin-0.15.2+mixin.0.8.7.jar mixin PLUGINSERVICE 
+		loader-4.0.24.jar slf4jfixer PLUGINSERVICE 
+		loader-4.0.24.jar runtime_enum_extender PLUGINSERVICE 
+		at-modlauncher-10.0.1.jar accesstransformer PLUGINSERVICE 
+		loader-4.0.24.jar runtimedistcleaner PLUGINSERVICE 
+		modlauncher-11.0.4.jar mixin TRANSFORMATIONSERVICE 
+		modlauncher-11.0.4.jar fml TRANSFORMATIONSERVICE 
+	FML Language Providers: 
+		javafml@4.0
+		lowcodefml@4.0
+		minecraft@4.0
+	Mod List: 
+		neoforge-21.1.50-minecraft-merged.jar             |Minecraft                     |minecraft                     |1.21.1              |Manifest: NOSIGNATURE
+		main                                              |SentinelLib                   |sentinellib                   |1.0-SNAPSHOT        |Manifest: NOSIGNATURE
+		neoforge-21.1.50-minecraft-merged.jar             |NeoForge                      |neoforge                      |21.1.50             |Manifest: NOSIGNATURE
+	Crash Report UUID: acb2ae25-4ff4-4605-bfed-1c57e2a919c0
+	FML: 4.0.24
+	NeoForge: 21.1.50
