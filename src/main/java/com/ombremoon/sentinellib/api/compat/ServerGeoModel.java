@@ -4,7 +4,9 @@ import com.ombremoon.sentinellib.Constants;
 import com.ombremoon.sentinellib.util.MatrixHelper;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import software.bernie.geckolib.GeckoLibConstants;
@@ -96,21 +98,45 @@ public abstract class ServerGeoModel<T extends GeoSentinel<T>> extends GeoModel<
     }
 
     public void setBoneWorldSpaceMatrix(T animatable, GeoBone bone) {
-        Entity sentinel = animatable.getSentinel();
+        // This matrix represents the transformation of the bone in relation to its parent
         Matrix4f localMatrix = new Matrix4f();
         MatrixHelper.translateMatrixToBone(localMatrix, bone);
         MatrixHelper.translateToPivotPoint(localMatrix, bone);
         MatrixHelper.rotateMatrixAroundBone(localMatrix, bone);
         MatrixHelper.scaleMatrixForBone(localMatrix, bone);
+        MatrixHelper.translateAwayFromPivotPoint(localMatrix, bone); // Crucial for correct pivot-based transformations
 
-        Matrix4f boneMatrix = bone.getParent() != null ? new Matrix4f(bone.getParent().getLocalSpaceMatrix()) : new Matrix4f();
-        Matrix4f worldSpaceMatrix = RenderUtil.translateMatrix(new Matrix4f(boneMatrix), sentinel.position().toVector3f());
+        // This is the bone's transformation in model space.
+        // We get the parent's model space matrix and multiply this bone's local transform onto it.
+        // For root bones, the parent matrix is the identity matrix.
+        Matrix4f modelSpaceMatrix = bone.getParent() != null ? new Matrix4f(bone.getParent().getLocalSpaceMatrix()) : new Matrix4f();
+        modelSpaceMatrix.mul(localMatrix);
 
-        bone.setLocalSpaceMatrix(boneMatrix);
+        // Store the calculated model-space matrix in the bone.
+        // NOTE: The field name `localSpaceMatrix` is a bit confusing here, as it's storing the model-space matrix.
+        // This matches the old code's intent to avoid further changes.
+        bone.setLocalSpaceMatrix(modelSpaceMatrix);
+
+        // Now, calculate the final world-space matrix.
+        // This includes the entity's position and rotation in the world.
+        Entity sentinel = animatable.getSentinel();
+        Matrix4f worldSpaceMatrix = new Matrix4f();
+
+        // 1. Translate to the entity's world position
+        worldSpaceMatrix.translate(sentinel.position().toVector3f());
+
+        // 2. Apply the entity's rotation, mimicking the client-side renderer's 180-degree flip
+        float yaw = (sentinel instanceof LivingEntity living) ? living.yBodyRot : sentinel.getYRot();
+        worldSpaceMatrix.rotate((180 - yaw) * Mth.DEG_TO_RAD, 0, 1, 0);
+
+        // 3. Apply the bone's full model-space transformation
+        worldSpaceMatrix.mul(modelSpaceMatrix);
+
         bone.setWorldSpaceMatrix(worldSpaceMatrix);
 
-        for (GeoBone geoBone : bone.getChildBones()) {
-            setBoneWorldSpaceMatrix(animatable, geoBone);
+        // Recurse for all children
+        for (GeoBone childBone : bone.getChildBones()) {
+            setBoneWorldSpaceMatrix(animatable, childBone);
         }
     }
 

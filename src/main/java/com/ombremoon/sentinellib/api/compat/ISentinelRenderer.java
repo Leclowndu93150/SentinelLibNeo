@@ -1,5 +1,6 @@
 package com.ombremoon.sentinellib.api.compat;
 
+import com.ombremoon.sentinellib.Constants;
 import com.ombremoon.sentinellib.networking.PayloadHandler;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -33,6 +34,14 @@ public interface ISentinelRenderer<T extends Entity & GeoAnimatable & GeoSentine
                     var boneScale = bone.getScaleVector();
                     var scale = new Vector3d(boneScale);
                     instance.setAnchorPoint(new Vec3(pos.x, pos.y, pos.z));
+
+                    if (getSentinel().tickCount == 5 && name.equals("mist1")) {
+                        Constants.LOG.info("[CLIENT] Bone: mist1 | Pos: {} | Rot (rad): {}", pos, rot);
+                    }
+                    if(getSentinel().tickCount == 5 && name.equals("mist5")) {
+                        Constants.LOG.info("[CLIENT] Bone: mist5 | Pos: {} | Rot (rad): {}", pos, rot);
+                    }
+
 
                     GeoBone geoBone = bone;
                     while (geoBone.getParent() != null) {
